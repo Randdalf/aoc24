@@ -1,0 +1,53 @@
+import aoc
+import math
+
+fn parse(input):
+    left = []
+    right = []
+    lines = input.split("\r\n")
+    for line in lines:
+        ids = line.split("   ")
+        left.add(int(ids[0]))
+        right.add(int(ids[1]))
+    return left, right
+
+fn swap(list, i0, i1):
+    temp = list[i0]
+    list[i0] = list[i1]
+    list[i1] = temp
+
+fn partition(list, lo_index, hi_index):
+    pivot = list[hi_index]
+    pivot_index = lo_index - 1
+    for test_index in lo_index...hi_index:
+        if list[test_index] <= pivot:
+            pivot_index += 1
+            swap(list, pivot_index, test_index)
+    pivot_index += 1
+    swap(list, pivot_index, hi_index)
+    return pivot_index
+
+fn quick_sort(list, lo_index, hi_index):
+    if lo_index >= hi_index or lo_index < 0: return
+    pivot_index = partition(list, lo_index, hi_index)
+    quick_sort(list, lo_index, pivot_index - 1)
+    quick_sort(list, pivot_index + 1, hi_index)
+
+fn sort(list):
+    quick_sort(list, 0, list.num() - 1)
+
+fn part1(input):
+    lists = parse(input)
+    left = lists[0]
+    right = lists[1]
+    sort(left)
+    sort(right)
+    total_distance = 0
+    for i in 0...left.num():
+        total_distance += math.abs(left[i] - right[i])
+    return total_distance
+
+fn part2(input):
+    pass
+
+aoc.solve(1, part1, part2)
