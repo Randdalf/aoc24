@@ -40,14 +40,33 @@ fn part1(input):
     lists = parse(input)
     left = lists[0]
     right = lists[1]
+
     sort(left)
     sort(right)
+
     total_distance = 0
     for i in 0...left.num():
         total_distance += math.abs(left[i] - right[i])
+
     return total_distance
 
 fn part2(input):
-    pass
+    lists = parse(input)
+    left = lists[0]
+    right = lists[1]
+
+    counts = {}
+    for n in right:
+        if n in counts:
+            counts[n] += 1
+        else:
+            counts[n] = 1
+
+    similarity_score = 0
+    for n in left:
+        if n in counts:
+            similarity_score += n * counts[n]
+
+    return similarity_score
 
 aoc.solve(1, part1, part2)
