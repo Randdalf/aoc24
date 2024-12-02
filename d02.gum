@@ -24,11 +24,11 @@ fn is_safe(report):
 
 fn is_damp_safe(report):
     for i in 0...report.num():
-        dampened_report = []
+        damp_report = []
         for j in 0...report.num():
             if i == j: continue
-            dampened_report.add(report[j])
-        if is_safe(dampened_report):
+            damp_report.add(report[j])
+        if is_safe(damp_report):
             return true
     return false
 
