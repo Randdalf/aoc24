@@ -10,24 +10,43 @@ fn parse(input):
         reports.add(levels)
     return reports
 
+fn is_safe(report):
+    sum_of_signs = 0
+    for i in 1...report.num():
+        diff = report[i] - report[i-1]
+        abs_diff = math.abs(diff)
+        if abs_diff < 1 or abs_diff > 3:
+            return false
+        sum_of_signs += math.sign(diff)
+    if math.abs(sum_of_signs) != report.num() - 1:
+        return false
+    return true
+
+fn is_damp_safe(report):
+    for i in 0...report.num():
+        dampened_report = []
+        for j in 0...report.num():
+            if i == j: continue
+            dampened_report.add(report[j])
+        if is_safe(dampened_report):
+            return true
+    return false
+
 export fn part1(input):
     reports = parse(input)
     num_safe = 0
-    for levels in reports:
-        safe = true
-        sum_of_signs = 0
-        for i in 1...levels.num():
-            diff = levels[i] - levels[i-1]
-            abs_diff = math.abs(diff)
-            if abs_diff < 1 or abs_diff > 3:
-                safe = false
-            sum_of_signs += math.sign(diff)
-        if math.abs(sum_of_signs) != levels.num() - 1:
-            safe = false
-        num_safe += int(safe)
+    for report in reports:
+        num_safe += int(is_safe(report))
     return num_safe
 
 export fn part2(input):
-    pass
+    reports = parse(input)
+    num_safe = 0
+    for report in reports:
+        if is_safe(report):
+            num_safe += 1
+            continue
+        num_safe += int(is_damp_safe(report))
+    return num_safe
 
 aoc.solve(2, part1, part2)
