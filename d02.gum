@@ -1,0 +1,33 @@
+import aoc
+import math
+
+fn parse(input):
+    reports = []
+    for line in input.split("\r\n"):
+        levels = []
+        for level in line.split(" "):
+            levels.add(int(level))
+        reports.add(levels)
+    return reports
+
+export fn part1(input):
+    reports = parse(input)
+    num_safe = 0
+    for levels in reports:
+        safe = true
+        sum_of_signs = 0
+        for i in 1...levels.num():
+            diff = levels[i] - levels[i-1]
+            abs_diff = math.abs(diff)
+            if abs_diff < 1 or abs_diff > 3:
+                safe = false
+            sum_of_signs += math.sign(diff)
+        if math.abs(sum_of_signs) != levels.num() - 1:
+            safe = false
+        num_safe += int(safe)
+    return num_safe
+
+export fn part2(input):
+    pass
+
+aoc.solve(2, part1, part2)
