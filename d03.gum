@@ -1,0 +1,49 @@
+import aoc
+
+class parser:
+    init(input, at):
+        self.input = input
+        self.at = at
+
+    fn expect(seq):
+        for i in 0...seq.len():
+            at = self.at + i
+            if at >= self.input.len():
+                return false
+            if self.input[at] != seq[i]:
+                return false
+        self.at += seq.len()
+        return true
+
+    fn number():
+        fn is_digit(c):
+            return c >= "0" and c <= "9"
+        at = self.at
+        start = at
+        while at < self.input.len() and is_digit(self.input[at]):
+            at += 1
+        n = at - start
+        if n < 1 or n > 3: return nil
+        self.at += n
+        return int(self.input[start...at])
+
+    fn resolve():
+        if not self.expect("mul("): return 0
+        left = self.number()
+        if left == nil: return 0
+        if not self.expect(","): return 0
+        right = self.number()
+        if right == nil: return 0
+        if not self.expect(")"): return 0
+        return left * right
+
+export fn part1(input):
+    sum = 0
+    for at in 0...input.len():
+        sum += parser(input, at).resolve()
+    return sum
+
+export fn part2(input):
+    pass
+
+aoc.solve(3, part1, part2)
