@@ -1,16 +1,18 @@
 import aoc
 
-class parser:
-    init(input, at):
-        self.input = input
-        self.at = at
+class Computer:
+    init(memory, cond_enabled):
+        self.memory = memory
+        self.at = 0
+        self.cond_enabled = cond_enabled
+        self.product = nil
 
-    fn expect(seq):
+    fn accept(seq):
         for i in 0...seq.len():
             at = self.at + i
-            if at >= self.input.len():
+            if at >= self.memory.len():
                 return false
-            if self.input[at] != seq[i]:
+            if self.memory[at] != seq[i]:
                 return false
         self.at += seq.len()
         return true
@@ -20,30 +22,61 @@ class parser:
             return c >= "0" and c <= "9"
         at = self.at
         start = at
-        while at < self.input.len() and is_digit(self.input[at]):
+        while at < self.memory.len() and is_digit(self.memory[at]):
             at += 1
         n = at - start
         if n < 1 or n > 3: return nil
         self.at += n
-        return int(self.input[start...at])
+        return int(self.memory[start...at])
 
-    fn resolve():
-        if not self.expect("mul("): return 0
+    fn mul():
         left = self.number()
-        if left == nil: return 0
-        if not self.expect(","): return 0
+        if left == nil:
+            return false
+        if not self.accept(","):
+            return false
         right = self.number()
-        if right == nil: return 0
-        if not self.expect(")"): return 0
-        return left * right
+        if right == nil:
+            return false
+        if not self.accept(")"):
+            return false
+        self.product = left * right
+        return true
+
+    fn next():
+        while self.at < self.memory.len():
+            if self.accept("mul("):
+                start = self.at
+                if not self.mul():
+                    self.at = start
+                    continue
+                return self.product
+            elif self.cond_enabled and self.accept("do()"):
+                return true
+            elif self.cond_enabled and self.accept("don't()"):
+                return false
+            else:
+                self.at += 1
+        return nil
+
+    fn execute():
+        sum = 0
+        token = self.next()
+        enabled = true
+        while token != nil:
+            if token == true:
+                enabled = true
+            elif token == false:
+                enabled = false
+            elif enabled:
+                sum += token
+            token = self.next()
+        return sum
 
 export fn part1(input):
-    sum = 0
-    for at in 0...input.len():
-        sum += parser(input, at).resolve()
-    return sum
+    return Computer(input, false).execute()
 
 export fn part2(input):
-    pass
+    return Computer(input, true).execute()
 
 aoc.solve(3, part1, part2)
