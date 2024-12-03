@@ -36,7 +36,7 @@ fn quick_sort(list, lo_index, hi_index):
 fn sort(list):
     quick_sort(list, 0, list.num() - 1)
 
-fn part1(input):
+export fn part1(input):
     lists = parse(input)
     left = lists[0]
     right = lists[1]
@@ -50,7 +50,7 @@ fn part1(input):
 
     return total_distance
 
-fn part2(input):
+export fn part2(input):
     lists = parse(input)
     left = lists[0]
     right = lists[1]
@@ -69,4 +69,5 @@ fn part2(input):
 
     return similarity_score
 
-aoc.solve(1, part1, part2)
+if is_main():
+    aoc.solve(1, part1, part2)

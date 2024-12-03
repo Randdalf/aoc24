@@ -1,0 +1,40 @@
+import io
+
+test_counter = {}
+
+fn test(day, part, actual, expected):
+    key = (day, part)
+    if key in test_counter:
+        test_counter[key] += 1
+    else:
+        test_counter[key] = 1
+    id = "D{day:02d}P{part} #{test_counter[key]}"
+    if actual != expected:
+        print("FAIL {id}: Expected \"{expected}\", but got \"{actual}\".")
+    else:
+        print("PASS {id}")
+
+# Day 1
+import d01
+
+d01_e1 = io.read_file_text("examples/d01_e1.txt")
+
+test(1, 1, d01.part1(d01_e1), 11)
+test(1, 2, d01.part2(d01_e1), 31)
+
+# Day 2
+import d02
+
+d02_e1 = io.read_file_text("examples/d02_e1.txt")
+
+test(2, 1, d02.part1(d02_e1), 2)
+test(2, 2, d02.part2(d02_e1), 4)
+
+# Day 3
+import d03
+
+d03_e1 = io.read_file_text("examples/d03_e1.txt")
+d03_e2 = io.read_file_text("examples/d03_e2.txt")
+
+test(3, 1, d03.part1(d03_e1), 161)
+test(3, 2, d03.part2(d03_e2), 48)

@@ -11,13 +11,14 @@ import pathlib
 
 template = '''import aoc
 
-fn part1(input):
+export fn part1(input):
     pass
 
-fn part2(input):
+export fn part2(input):
     pass
 
-aoc.solve({day}, part1, part2)
+if is_main():
+    aoc.solve({day}, part1, part2)
 '''
 
 

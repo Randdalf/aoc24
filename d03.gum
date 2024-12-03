@@ -79,4 +79,5 @@ export fn part1(input):
 export fn part2(input):
     return Computer(input, true).execute()
 
-aoc.solve(3, part1, part2)
+if is_main():
+    aoc.solve(3, part1, part2)
