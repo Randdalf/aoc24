@@ -45,3 +45,4 @@ import d04
 d04_e1 = io.read_file_text("examples/d04_e1.txt")
 
 test(4, 1, d04.part1(d04_e1), 18)
+test(4, 2, d04.part2(d04_e1), 9)

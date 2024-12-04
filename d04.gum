@@ -1,41 +1,55 @@
 import aoc
 
-xmas = ["X", "M", "A", "S"]
-samx = ["S", "A", "M", "X"]
-
 class WordSearch:
     init(input):
         self.rows = input.split("\r\n")
         self.w = self.rows[0].len()
         self.h = self.rows.num()
 
-    fn get(x, y):
-        return self.rows[y][x]
-
-    fn test(x, y, dx, dy):
+    fn test(x, y, dx, dy, fwd, bck):
         result = []
-        for i in 0...xmas.num():
+        for i in 0...fwd.num():
             if x < 0 or x >= self.w: return 0
             if y < 0 or y >= self.h: return 0
-            result.add(self.get(x, y))
+            result.add(self.rows[y][x])
             x += dx
             y += dy
-        return int(result == xmas or result == samx)
+        return int(result == fwd or result == bck)
 
 export fn part1(input):
     ws = WordSearch(input)
+    xmas = ["X", "M", "A", "S"]
+    samx = ["S", "A", "M", "X"]
     occurs = 0
-    n = xmas.num()
     for x in 0...ws.w:
         for y in 0...ws.h:
-            occurs += ws.test(x, y, 1, 0)
-            occurs += ws.test(x, y, 0, 1)
-            occurs += ws.test(x, y, 1, 1)
-            occurs += ws.test(x, y, 1, -1)
+            occurs += ws.test(x, y, 1, 0, xmas, samx)
+            occurs += ws.test(x, y, 0, 1, xmas, samx)
+            occurs += ws.test(x, y, 1, 1, xmas, samx)
+            occurs += ws.test(x, y, 1, -1, xmas, samx)
     return occurs
 
 export fn part2(input):
-    pass
+    ws = WordSearch(input)
+    sam = ["S", "A", "M"]
+    mas = ["M", "A", "S"]
+    centers = {}
+    fn add_center(center):
+        if center in centers:
+            centers[center] += 1
+        else:
+            centers[center] = 1
+    for x in 0...ws.w:
+        for y in 0...ws.h:
+            if ws.test(x, y, 1, 1, mas, sam) > 0:
+                add_center((x + 1, y + 1))
+            if ws.test(x, y, 1, -1, mas, sam) > 0:
+                add_center((x + 1, y - 1))
+    counter = 0
+    for center in centers:
+        if centers[center] >= 2:
+            counter += 1
+    return counter
 
 if is_main():
     aoc.solve(4, part1, part2)
