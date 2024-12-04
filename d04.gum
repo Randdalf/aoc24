@@ -1,0 +1,41 @@
+import aoc
+
+xmas = ["X", "M", "A", "S"]
+samx = ["S", "A", "M", "X"]
+
+class WordSearch:
+    init(input):
+        self.rows = input.split("\r\n")
+        self.w = self.rows[0].len()
+        self.h = self.rows.num()
+
+    fn get(x, y):
+        return self.rows[y][x]
+
+    fn test(x, y, dx, dy):
+        result = []
+        for i in 0...xmas.num():
+            if x < 0 or x >= self.w: return 0
+            if y < 0 or y >= self.h: return 0
+            result.add(self.get(x, y))
+            x += dx
+            y += dy
+        return int(result == xmas or result == samx)
+
+export fn part1(input):
+    ws = WordSearch(input)
+    occurs = 0
+    n = xmas.num()
+    for x in 0...ws.w:
+        for y in 0...ws.h:
+            occurs += ws.test(x, y, 1, 0)
+            occurs += ws.test(x, y, 0, 1)
+            occurs += ws.test(x, y, 1, 1)
+            occurs += ws.test(x, y, 1, -1)
+    return occurs
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(4, part1, part2)
