@@ -42,6 +42,20 @@ fn parse_updates(input):
         updates.add(update)
     return updates
 
+fn is_page_at_index_ordered(rules, update, i):
+    page = update[i]
+    if rules.any_after(page, update[0...i]):
+        return false
+    if rules.any_before(page, update[(i+1)...update.num()]):
+        return false
+    return true
+
+fn is_ordered(rules, update):
+    for i in 0...update.num():
+        if not is_page_at_index_ordered(rules, update, i):
+            return false
+    return true
+
 fn middle(pages):
     return pages[math.trunc(pages.num()/2)]
 
@@ -49,28 +63,36 @@ export fn part1(input):
     parts = input.split("\r\n\r\n")
     rules = PageOrderingRules(parts[0])
     updates = parse_updates(parts[1])
-
     sum = 0
     for update in updates:
-        correct = true
-        for i in 0...update.num():
-            page = update[i]
-
-            if rules.any_after(page, update[0...i]):
-                correct = false
-                break
-
-            if rules.any_before(page, update[(i+1)...update.num()]):
-                correct = false
-                break
-
-        if correct:
+        if is_ordered(rules, update):
             sum += middle(update)
-
     return sum
 
+fn order_update(rules, update):
+    ordered = []
+    for i in 0...update.num():
+        ordered.add(nil)
+    for page in update:
+        num_before = 0
+        if page in rules.before:
+            before = rules.before[page]
+            for other in update:
+                if other in before:
+                    num_before += 1
+        ordered[num_before] = page
+    return ordered
+
 export fn part2(input):
-    pass
+    parts = input.split("\r\n\r\n")
+    rules = PageOrderingRules(parts[0])
+    updates = parse_updates(parts[1])
+    sum = 0
+    for update in updates:
+        if is_ordered(rules, update):
+            continue
+        sum += middle(order_update(rules, update))
+    return sum
 
 if is_main():
     aoc.solve(5, part1, part2)
