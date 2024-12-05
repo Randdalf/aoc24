@@ -1,0 +1,76 @@
+import aoc
+import math
+
+class PageOrderingRules:
+    init(input):
+        self.before = {}
+        self.after = {}
+
+        fn add_rule(rules, key, value):
+            if key in rules:
+                rules[key].add(value, nil)
+            else:
+                rules[key] = {value: nil}
+
+        for line in input.split("\r\n"):
+            pages = line.split("|")
+            left = int(pages[0])
+            right = int(pages[1])
+            add_rule(self.before, right, left)
+            add_rule(self.after, left, right)
+
+    fn any(page, others, rules):
+        if page in rules:
+            allowed = rules[page]
+            for other in others:
+                if other in allowed:
+                    return true
+        return false
+
+    fn any_before(page, others):
+        return self.any(page, others, self.before)
+
+    fn any_after(page, others):
+        return self.any(page, others, self.after)
+
+fn parse_updates(input):
+    updates = []
+    for line in input.split("\r\n"):
+        update = []
+        for page in line.split(","):
+            update.add(int(page))
+        updates.add(update)
+    return updates
+
+fn middle(pages):
+    return pages[math.trunc(pages.num()/2)]
+
+export fn part1(input):
+    parts = input.split("\r\n\r\n")
+    rules = PageOrderingRules(parts[0])
+    updates = parse_updates(parts[1])
+
+    sum = 0
+    for update in updates:
+        correct = true
+        for i in 0...update.num():
+            page = update[i]
+
+            if rules.any_after(page, update[0...i]):
+                correct = false
+                break
+
+            if rules.any_before(page, update[(i+1)...update.num()]):
+                correct = false
+                break
+
+        if correct:
+            sum += middle(update)
+
+    return sum
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(5, part1, part2)
