@@ -1,37 +1,22 @@
 import aoc
 import math
 
-class PageOrderingRules:
-    init(input):
-        self.before = {}
-        self.after = {}
+class Result:
+    init(correct, incorrect):
+        self.correct = correct
+        self.incorrect = incorrect
 
-        fn add_rule(rules, key, value):
-            if key in rules:
-                rules[key].add(value, nil)
-            else:
-                rules[key] = {value: nil}
-
-        for line in input.split("\r\n"):
-            pages = line.split("|")
-            left = int(pages[0])
-            right = int(pages[1])
-            add_rule(self.before, right, left)
-            add_rule(self.after, left, right)
-
-    fn any(page, others, rules):
-        if page in rules:
-            allowed = rules[page]
-            for other in others:
-                if other in allowed:
-                    return true
-        return false
-
-    fn any_before(page, others):
-        return self.any(page, others, self.before)
-
-    fn any_after(page, others):
-        return self.any(page, others, self.after)
+fn parse_rules(input):
+    rules = {}
+    for line in input.split("\r\n"):
+        pages = line.split("|")
+        before = int(pages[0])
+        after = int(pages[1])
+        if after in rules:
+            rules[after].add(before, nil)
+        else:
+            rules[after] = {before: nil}
+    return rules
 
 fn parse_updates(input):
     updates = []
@@ -42,32 +27,8 @@ fn parse_updates(input):
         updates.add(update)
     return updates
 
-fn is_page_at_index_ordered(rules, update, i):
-    page = update[i]
-    if rules.any_after(page, update[0...i]):
-        return false
-    if rules.any_before(page, update[(i+1)...update.num()]):
-        return false
-    return true
-
-fn is_ordered(rules, update):
-    for i in 0...update.num():
-        if not is_page_at_index_ordered(rules, update, i):
-            return false
-    return true
-
 fn middle(pages):
     return pages[math.trunc(pages.num()/2)]
-
-export fn part1(input):
-    parts = input.split("\r\n\r\n")
-    rules = PageOrderingRules(parts[0])
-    updates = parse_updates(parts[1])
-    sum = 0
-    for update in updates:
-        if is_ordered(rules, update):
-            sum += middle(update)
-    return sum
 
 fn order_update(rules, update):
     ordered = []
@@ -75,24 +36,33 @@ fn order_update(rules, update):
         ordered.add(nil)
     for page in update:
         num_before = 0
-        if page in rules.before:
-            before = rules.before[page]
+        if page in rules:
+            before = rules[page]
             for other in update:
                 if other in before:
                     num_before += 1
         ordered[num_before] = page
     return ordered
 
-export fn part2(input):
+fn process(input):
     parts = input.split("\r\n\r\n")
-    rules = PageOrderingRules(parts[0])
+    rules = parse_rules(parts[0])
     updates = parse_updates(parts[1])
-    sum = 0
+    correct = 0
+    incorrect = 0
     for update in updates:
-        if is_ordered(rules, update):
-            continue
-        sum += middle(order_update(rules, update))
-    return sum
+        ordered_update = order_update(rules, update)
+        if update == ordered_update:
+            correct += middle(update)
+        else:
+            incorrect += middle(ordered_update)
+    return Result(correct, incorrect)
+
+export fn part1(input):
+    return process(input).correct
+
+export fn part2(input):
+    return process(input).incorrect
 
 if is_main():
     aoc.solve(5, part1, part2)
