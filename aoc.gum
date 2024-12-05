@@ -6,7 +6,7 @@ fn run_solver(solver, input):
     start = time.clock()
     result = solver(input)
     elapsed = time.clock() - start
-    print("{result:<30} {elapsed:.4f}ms")
+    print("{result:<30} {elapsed:.4f}s")
 
 export fn solve(day, part1, part2):
     input = io.read_file_text("d{day:02d}.txt")
