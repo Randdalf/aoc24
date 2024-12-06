@@ -50,3 +50,4 @@ test(5, 2, d05.part2, 1, 123)
 import d06
 
 test(6, 1, d06.part1, 1, 41)
+test(6, 2, d06.part2, 1, 6)

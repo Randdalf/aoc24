@@ -13,6 +13,7 @@ fn step_west(pos):
     return (pos[0] - 1, pos[1])
 
 steps = [step_north, step_east, step_south, step_west]
+rot90 = [1, 2, 3, 0]
 
 class Map:
     init(input):
@@ -36,25 +37,64 @@ class Map:
         y = pos[1]
         return x < 0 or x >= self.width or y < 0 or y >= self.height
 
-export fn part1(input):
-    map = Map(input)
-    pos = map.start
-    dir = 0
-    visited = {}
+fn patrol(map, pos, dir, callback):
     while true:
-        visited.add(pos, nil)
         next = steps[dir](pos)
         if next in map.obstacles:
-            dir += 1
-            if dir == steps.num(): dir = 0 # No modulo operator yet!
-        elif map.is_outside(next):
-            break
+            dir = rot90[dir]
         else:
-            pos = next
+            if not callback(pos, dir):
+                break
+            if map.is_outside(next):
+                break
+            else:
+                pos = next
+
+export fn part1(input):
+    map = Map(input)
+    visited = {}
+    fn visit(pos, dir):
+        visited.add(pos, nil)
+        return true
+    patrol(map, map.start, 0, visit)
     return visited.num()
 
 export fn part2(input):
-    pass
+    map = Map(input)
+
+    # Patrol the original route, recording each node visited and the direction
+    # when exiting that node.
+    path = []
+    dirs = []
+    fn visit(pos, dir):
+        path.add(pos)
+        dirs.add(dir)
+        return true
+    patrol(map, map.start, 0, visit)
+
+    # For each node in the original route, except the start, insert an obstacle
+    # and see if it would generate a loop.
+    num_loops = 0
+    tested = {}
+    for i in 1...path.num():
+        obstacle = path[i]
+        if obstacle in tested:
+            continue
+        tested.add(obstacle, nil)
+        start = path[i-1]
+        dir = rot90[dirs[i-1]]
+        map.obstacles.add(obstacle, nil)
+        visited = {}
+        fn visit(pos, dir):
+            if (pos, dir) in visited:
+                num_loops += 1
+                return false
+            visited.add((pos, dir), nil)
+            return true
+        patrol(map, start, dir, visit)
+        map.obstacles.remove(obstacle)
+
+    return num_loops
 
 if is_main():
     aoc.solve(6, part1, part2)
