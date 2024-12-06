@@ -1,0 +1,60 @@
+import aoc
+
+fn step_north(pos):
+    return (pos[0], pos[1] - 1)
+
+fn step_east(pos):
+    return (pos[0] + 1, pos[1])
+
+fn step_south(pos):
+    return (pos[0], pos[1] + 1)
+
+fn step_west(pos):
+    return (pos[0] - 1, pos[1])
+
+steps = [step_north, step_east, step_south, step_west]
+
+class Map:
+    init(input):
+        rows = input.split("\r\n")
+        self.obstacles = {}
+        for y in 0...rows.num():
+            row = rows[y]
+            for x in 0...row.len():
+                if row[x] == "#":
+                    self.obstacles.add((x, y), nil)
+                elif row[x] == "^":
+                    self.start = (x, y)
+        self.width = rows[0].len()
+        self.height = rows.num()
+
+    fn is_obstacle(pos):
+        return pos in self.obstacles
+
+    fn is_outside(pos):
+        x = pos[0]
+        y = pos[1]
+        return x < 0 or x >= self.width or y < 0 or y >= self.height
+
+export fn part1(input):
+    map = Map(input)
+    pos = map.start
+    dir = 0
+    visited = {}
+    while true:
+        visited.add(pos, nil)
+        next = steps[dir](pos)
+        if next in map.obstacles:
+            dir += 1
+            if dir == steps.num(): dir = 0 # No modulo operator yet!
+        elif map.is_outside(next):
+            break
+        else:
+            pos = next
+    return visited.num()
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(6, part1, part2)

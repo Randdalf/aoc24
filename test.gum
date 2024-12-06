@@ -54,3 +54,11 @@ d05_e1 = io.read_file_text("examples/d05_e1.txt")
 
 test(5, 1, d05.part1(d05_e1), 143)
 test(5, 2, d05.part2(d05_e1), 123)
+
+
+# Day 5
+import d06
+
+d06_e1 = io.read_file_text("examples/d06_e1.txt")
+
+test(6, 1, d06.part1(d06_e1), 41)
