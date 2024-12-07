@@ -1,0 +1,38 @@
+import aoc
+
+class Equation:
+    init(input):
+        parts = input.split(": ")
+        self.value = int(parts[0])
+        self.numbers = []
+        for x in parts[1].split(" "):
+            self.numbers.add(int(x))
+
+fn parse(input):
+    equations = []
+    for line in input.split("\r\n"):
+        equations.add(Equation(line))
+    return equations
+
+fn solve(equation, i, scratch):
+    if scratch > equation.value:
+        return false
+    if i >= equation.numbers.num():
+        return scratch == equation.value
+    if solve(equation, i+1, scratch + equation.numbers[i]):
+        return true
+    return solve(equation, i+1, scratch * equation.numbers[i])
+
+export fn part1(input):
+    equations = parse(input)
+    sum = 0
+    for equation in equations:
+        if solve(equation, 1, equation.numbers[0]):
+            sum += equation.value
+    return sum
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(7, part1, part2)
