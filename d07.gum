@@ -14,25 +14,33 @@ fn parse(input):
         equations.add(Equation(line))
     return equations
 
-fn solve(equation, i, scratch):
+fn concat(a, b):
+    return int("{a}{b}")
+
+fn search(equation, i, scratch, allow_concat):
     if scratch > equation.value:
         return false
     if i >= equation.numbers.num():
         return scratch == equation.value
-    if solve(equation, i+1, scratch + equation.numbers[i]):
+    if allow_concat and search(equation, i+1, concat(scratch, equation.numbers[i]), true):
         return true
-    return solve(equation, i+1, scratch * equation.numbers[i])
+    if search(equation, i+1, scratch + equation.numbers[i], allow_concat):
+        return true
+    return search(equation, i+1, scratch * equation.numbers[i], allow_concat)
 
-export fn part1(input):
+fn solve(input, allow_concat):
     equations = parse(input)
     sum = 0
     for equation in equations:
-        if solve(equation, 1, equation.numbers[0]):
+        if search(equation, 1, equation.numbers[0], allow_concat):
             sum += equation.value
     return sum
 
+export fn part1(input):
+    return solve(input, false)
+
 export fn part2(input):
-    pass
+    return solve(input, true)
 
 if is_main():
     aoc.solve(7, part1, part2)
