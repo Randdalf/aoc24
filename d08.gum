@@ -1,5 +1,20 @@
 import aoc
 
+class Vec2:
+    init(x, y):
+        self.x = x
+        self.y = y
+
+    op +(a, b):
+        return Vec2(a.x + b.x, a.y + b.y)
+
+    op -(a, b):
+        return Vec2(a.x - b.x, a.y - b.y)
+
+    fn tuple():
+        # Instances of classes are not yet hashable, but tuples are.
+        return (self.x, self.y)
+
 class Map:
     init(input):
         rows = input.split("\r\n")
@@ -13,36 +28,52 @@ class Map:
                 if freq == ".":
                     continue
                 elif freq in self.antennae:
-                    self.antennae[freq].add((x, y))
+                    self.antennae[freq].add(Vec2(x, y))
                 else:
-                    self.antennae[freq] = [(x, y)]
+                    self.antennae[freq] = [Vec2(x, y)]
 
     fn contains(pos):
-        x = pos[0]
-        y = pos[1]
-        return x >= 0 and x < self.width and y >= 0 and y < self.height
+        return pos.x >= 0 and pos.x < self.width and pos.y >= 0 and pos.y < self.height
 
 export fn part1(input):
     map = Map(input)
-    locations = {}
+    antinodes = {}
     for freq in map.antennae:
         antennae = map.antennae[freq]
         for i in 0...antennae.num():
             a = antennae[i]
             for j in (i+1)...antennae.num():
                 b = antennae[j]
-                dist_x = b[0] - a[0]
-                dist_y = b[1] - a[1]
-                pos_1 = (b[0] + dist_x, b[1] + dist_y)
-                pos_2 = (a[0] - dist_x , a[1] - dist_y)
-                if map.contains(pos_1):
-                    locations.add(pos_1, nil)
-                if map.contains(pos_2):
-                    locations.add(pos_2, nil)
-    return locations.num()
+                dist = b - a
+                antinode = b + dist
+                if map.contains(antinode):
+                    antinodes.add(antinode.tuple(), nil)
+                antinode = a - dist
+                if map.contains(antinode):
+                    antinodes.add(antinode.tuple(), nil)
+    return antinodes.num()
 
 export fn part2(input):
-    pass
+    map = Map(input)
+    antinodes = {}
+    for freq in map.antennae:
+        antennae = map.antennae[freq]
+        for i in 0...antennae.num():
+            a = antennae[i]
+            antinodes.add(a.tuple(), nil)
+            for j in (i+1)...antennae.num():
+                b = antennae[j]
+                antinodes.add(b.tuple(), nil)
+                dist = b - a
+                antinode = b + dist
+                while map.contains(antinode):
+                    antinodes.add(antinode.tuple(), nil)
+                    antinode += dist
+                antinode = a - dist
+                while map.contains(antinode):
+                    antinodes.add(antinode.tuple(), nil)
+                    antinode -= dist
+    return antinodes.num()
 
 if is_main():
     aoc.solve(8, part1, part2)
