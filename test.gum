@@ -56,3 +56,7 @@ test(6, 2, d06.part2, 1, 6)
 import d07
 test(7, 1, d07.part1, 1, 3749)
 test(7, 2, d07.part2, 1, 11387)
+
+# Day 8
+import d08
+test(8, 1, d08.part1, 1, 14)

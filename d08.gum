@@ -1,0 +1,48 @@
+import aoc
+
+class Map:
+    init(input):
+        rows = input.split("\r\n")
+        self.width = rows[0].len()
+        self.height = rows.num()
+        self.antennae = {}
+        for y in 0...rows.num():
+            row = rows[y]
+            for x in 0...row.len():
+                freq = row[x]
+                if freq == ".":
+                    continue
+                elif freq in self.antennae:
+                    self.antennae[freq].add((x, y))
+                else:
+                    self.antennae[freq] = [(x, y)]
+
+    fn contains(pos):
+        x = pos[0]
+        y = pos[1]
+        return x >= 0 and x < self.width and y >= 0 and y < self.height
+
+export fn part1(input):
+    map = Map(input)
+    locations = {}
+    for freq in map.antennae:
+        antennae = map.antennae[freq]
+        for i in 0...antennae.num():
+            a = antennae[i]
+            for j in (i+1)...antennae.num():
+                b = antennae[j]
+                dist_x = b[0] - a[0]
+                dist_y = b[1] - a[1]
+                pos_1 = (b[0] + dist_x, b[1] + dist_y)
+                pos_2 = (a[0] - dist_x , a[1] - dist_y)
+                if map.contains(pos_1):
+                    locations.add(pos_1, nil)
+                if map.contains(pos_2):
+                    locations.add(pos_2, nil)
+    return locations.num()
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(8, part1, part2)
