@@ -20,17 +20,17 @@ class Map:
         rows = input.split("\r\n")
         self.width = rows[0].len()
         self.height = rows.num()
-        self.antennae = {}
+        self.antennas = {}
         for y in 0...rows.num():
             row = rows[y]
             for x in 0...row.len():
                 freq = row[x]
                 if freq == ".":
                     continue
-                elif freq in self.antennae:
-                    self.antennae[freq].add(Vec2(x, y))
+                elif freq in self.antennas:
+                    self.antennas[freq].add(Vec2(x, y))
                 else:
-                    self.antennae[freq] = [Vec2(x, y)]
+                    self.antennas[freq] = [Vec2(x, y)]
 
     fn contains(pos):
         return pos.x >= 0 and pos.x < self.width and pos.y >= 0 and pos.y < self.height
@@ -38,12 +38,12 @@ class Map:
 export fn part1(input):
     map = Map(input)
     antinodes = {}
-    for freq in map.antennae:
-        antennae = map.antennae[freq]
-        for i in 0...antennae.num():
-            a = antennae[i]
-            for j in (i+1)...antennae.num():
-                b = antennae[j]
+    for freq in map.antennas:
+        antennas = map.antennas[freq]
+        for i in 0...antennas.num():
+            a = antennas[i]
+            for j in (i+1)...antennas.num():
+                b = antennas[j]
                 dist = b - a
                 antinode = b + dist
                 if map.contains(antinode):
@@ -56,13 +56,13 @@ export fn part1(input):
 export fn part2(input):
     map = Map(input)
     antinodes = {}
-    for freq in map.antennae:
-        antennae = map.antennae[freq]
-        for i in 0...antennae.num():
-            a = antennae[i]
+    for freq in map.antennas:
+        antennas = map.antennas[freq]
+        for i in 0...antennas.num():
+            a = antennas[i]
             antinodes.add(a.tuple(), nil)
-            for j in (i+1)...antennae.num():
-                b = antennae[j]
+            for j in (i+1)...antennas.num():
+                b = antennas[j]
                 antinodes.add(b.tuple(), nil)
                 dist = b - a
                 antinode = b + dist
