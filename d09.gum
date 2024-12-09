@@ -1,42 +1,128 @@
 import aoc
 
 export fn part1(input):
+    # Process the disk map.
     is_block = true
-    layout = []
-    free = []
+    disk = []
     id = 0
     for c in input:
         n = int(c)
         if is_block:
             for i in 0...n:
-                layout.add(id)
+                disk.add(id)
             id += 1
         else:
             for i in 0...n:
-                free.add(layout.num())
-                layout.add(nil)
+                disk.add(nil)
         is_block = not is_block
 
-    free = free[(free.num() - 1)..0]
-    for i in (layout.num() - 1)..0:
-        if free.num() == 0: break
-        id = layout[i]
-        if id == nil: continue
-        slot = free.pop()
-        if slot >= i: break
-        layout[slot] = id
-        layout[i] = nil
-        
-    checksum = 0
-    for i in 0...layout.num():
-        id = layout[i]
-        if id == nil: break
-        checksum += id * i
+    # Build a list of free blocks.
+    free = []
+    for at in (disk.num() - 1)..0:
+        if disk[at] == nil:
+            free.add(at)
     
-    return checksum
+    # Compact the disk.
+    for at in (disk.num() - 1)..0:
+        if free.num() == 0: break
+        id = disk[at]
+        if id == nil: continue
+        addr = free.pop()
+        if addr >= at: break
+        disk[addr] = id
+        disk[at] = nil
+
+    # Calculate the checksum.
+    sum = 0
+    for at in 0...disk.num():
+        id = disk[at]
+        if id == nil: continue
+        sum += id * at
+
+    return sum
+
+class Block:
+    init(addr, size, id):
+        self.addr = addr
+        self.size = size
+        self.id = id
+
+    fn checksum():
+        sum = 0
+        at = self.addr
+        for i in 0...self.size:
+            sum += at * self.id
+            at += 1
+        return sum
 
 export fn part2(input):
-    pass
+    # Process the disk map, forming a map of free blocks by size.
+    is_block = true
+    id = 0
+    blocks = []
+    free_lists = []
+    at = 0
+    for c in input:
+        size = int(c)
+        if is_block:
+            blocks.add(Block(at, size, id))
+            id += 1
+        else:
+            block = Block(at, size, nil)
+            while size >= free_lists.num():
+                free_lists.add([])
+            free_lists[size].add(block)
+        at += size
+        is_block = not is_block
+
+    # Order the lowest address last in the free lists.
+    for size in 0...free_lists.num():
+        free_blocks = free_lists[size]
+        free_lists[size] = free_blocks[(free_blocks.num() - 1)..0]
+
+    # Utility for finding the lowest free block that fits the given block.
+    fn find_free(block):
+        best_blocks = nil
+        best_addr = block.addr
+        for i in block.size...free_lists.num():
+            free_blocks = free_lists[i]
+            if free_blocks.num() == 0:
+                continue
+            free_block = free_blocks[-1]
+            if best_addr == nil or free_block.addr < best_addr:
+                best_blocks = free_blocks
+                best_addr = free_block.addr
+        if best_blocks:
+            return best_blocks.pop()
+
+    # Utility for inserting a free block back into the free list.
+    fn insert_free(free_block):
+        if free_block.size == 0:
+            return
+        free_blocks = free_lists[free_block.size]
+        i = 0
+        while i < free_blocks.num() and free_blocks[i].addr > free_block.addr:
+            i += 1
+        free_blocks.insert(i, free_block)
+
+    # Compact the disk.
+    for i in (blocks.num() - 1)..0:
+        block = blocks[i]
+        free_block = find_free(block)
+        if free_block == nil:
+            continue
+        block.addr = free_block.addr
+        free_block.size -= block.size
+        free_block.addr += block.size
+        insert_free(free_block)
+        
+    # Calculate the checksum.
+    sum = 0
+    for block in blocks:
+        sum += block.checksum()
+
+    return sum
+
 
 if is_main():
     aoc.solve(9, part1, part2)
