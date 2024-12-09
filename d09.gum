@@ -1,0 +1,42 @@
+import aoc
+
+export fn part1(input):
+    is_block = true
+    layout = []
+    free = []
+    id = 0
+    for c in input:
+        n = int(c)
+        if is_block:
+            for i in 0...n:
+                layout.add(id)
+            id += 1
+        else:
+            for i in 0...n:
+                free.add(layout.num())
+                layout.add(nil)
+        is_block = not is_block
+
+    free = free[(free.num() - 1)..0]
+    for i in (layout.num() - 1)..0:
+        if free.num() == 0: break
+        id = layout[i]
+        if id == nil: continue
+        slot = free.pop()
+        if slot >= i: break
+        layout[slot] = id
+        layout[i] = nil
+        
+    checksum = 0
+    for i in 0...layout.num():
+        id = layout[i]
+        if id == nil: break
+        checksum += id * i
+    
+    return checksum
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(9, part1, part2)
