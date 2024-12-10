@@ -1,0 +1,57 @@
+import aoc
+
+class Map:
+    init(input):
+        rows = input.split("\r\n")
+        self.height = rows.num()
+        self.width = rows[0].len()
+        self.heightmap = {}
+        self.trailheads = []
+        for y in 0...rows.num():
+            row = rows[y]
+            for x in 0...row.len():
+                tile = row[x]
+                if tile >= "0" and tile <= "9":
+                    height = int(tile)
+                    self.heightmap.add((x, y), height)
+                    if height == 0:
+                        self.trailheads.add((x, y))
+
+fn score(map, x, y, height, reached):
+    pos = (x, y)
+    if not (pos in map.heightmap):
+        return 0
+    if map.heightmap[pos] != height:
+        return 0
+    if height == 9:
+        if not reached:
+            return 1
+        elif pos in reached:
+            return 0
+        else:
+            reached.add(pos, nil)
+            return 1
+    sum = 0
+    sum += score(map, x - 1, y, height + 1, reached)
+    sum += score(map, x, y - 1, height + 1, reached)
+    sum += score(map, x + 1, y, height + 1, reached)
+    sum += score(map, x, y + 1, height + 1, reached)
+    return sum
+
+fn process(input, rating):
+    map = Map(input)
+    sum = 0
+    for trailhead in map.trailheads:
+        reached = nil
+        if not rating: reached = {}
+        sum += score(map, trailhead[0], trailhead[1], 0, reached)
+    return sum
+
+export fn part1(input):
+    return process(input, false)
+
+export fn part2(input):
+    return process(input, true)
+
+if is_main():
+    aoc.solve(10, part1, part2)
