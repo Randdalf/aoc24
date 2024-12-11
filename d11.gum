@@ -1,0 +1,41 @@
+import aoc
+import math
+
+fn parse(input):
+    stones = []
+    for part in input.split(" "):
+        stones.add(int(part))
+    return stones
+
+fn count(stone, cache, blinks):
+    if blinks == 0:
+        return 1
+    key = (stone, blinks)
+    if key in cache:
+        return cache[key]
+    fn store(result):
+        cache[key] = result
+        return result
+    if stone == 0:
+        return store(count(1, cache, blinks - 1))
+    digits = "{stone}"
+    n = digits.len()
+    if math.is_even(n):
+        h = n/2
+        left = int(digits[0...h])
+        right = int(digits[h...n])
+        return store(count(left, cache, blinks - 1) + count(right, cache, blinks - 1))
+    return store(count(stone * 2024, cache, blinks - 1))
+
+export fn part1(input):
+    result = 0
+    cache = {}
+    for stone in parse(input):
+        result += count(stone, cache, 25)
+    return result
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(11, part1, part2)

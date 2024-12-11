@@ -73,3 +73,7 @@ test(10, 2, d10.part2, 6, 3)
 test(10, 2, d10.part2, 7, 13)
 test(10, 2, d10.part2, 8, 227)
 test(10, 2, d10.part2, 5, 81)
+
+# Day 11
+import d11
+test(11, 1, d11.part1, 1, 55312)
