@@ -27,15 +27,18 @@ fn count(stone, cache, blinks):
         return store(count(left, cache, blinks - 1) + count(right, cache, blinks - 1))
     return store(count(stone * 2024, cache, blinks - 1))
 
-export fn part1(input):
+fn process(input, blinks):
     result = 0
     cache = {}
     for stone in parse(input):
-        result += count(stone, cache, 25)
+        result = result + count(stone, cache, blinks)
     return result
 
+export fn part1(input):
+    return process(input, 25)
+
 export fn part2(input):
-    pass
+    return process(input, 75)
 
 if is_main():
     aoc.solve(11, part1, part2)
