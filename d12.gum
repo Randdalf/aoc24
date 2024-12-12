@@ -1,0 +1,65 @@
+import aoc
+
+class Map:
+    init(input):
+        rows = input.split("\r\n")
+        self.height = rows.num()
+        self.width = rows[0].len()
+        self.plots = {}
+        for y in 0...rows.num():
+            row = rows[y]
+            for x in 0...row.len():
+                self.plots.add((x, y), row[x])
+
+fn fill_region(map, pos, type, visited):
+    region = {}
+    pending = [pos] 
+    while pending.num() > 0:
+        pos = pending.pop()
+        if pos in visited:
+            continue
+        if not map.plots.contains(pos):
+            continue
+        if map.plots[pos] != type:
+            continue
+        region.add(pos, nil)
+        visited.add(pos, nil)
+        x = pos[0]
+        y = pos[1]
+        pending.add((x - 1, y))
+        pending.add((x, y - 1))
+        pending.add((x + 1, y))
+        pending.add((x, y + 1))
+    return region
+
+fn count_fences(map, x, y, type):
+    fn needs_fence(x, y):
+        pos = (x, y)
+        return not map.plots.contains(pos) or map.plots[pos] != type 
+    num_fences = 0
+    num_fences += int(needs_fence(x - 1, y))
+    num_fences += int(needs_fence(x, y - 1))
+    num_fences += int(needs_fence(x + 1, y))
+    num_fences += int(needs_fence(x, y + 1))
+    return num_fences
+
+export fn part1(input):
+    map = Map(input)
+    visited = {}
+    price = 0
+    for pos in map.plots:
+        if pos in visited:
+            continue
+        type = map.plots[pos]
+        region = fill_region(map, pos, type, visited)
+        perimeter = 0
+        for pos in region:
+            perimeter += count_fences(map, pos[0], pos[1], type)
+        price += region.num() * perimeter
+    return price
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(12, part1, part2)
