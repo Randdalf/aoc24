@@ -11,8 +11,13 @@ class Map:
             for x in 0...row.len():
                 self.plots.add((x, y), row[x])
 
+class Region:
+    init(type, plots):
+        self.type = type
+        self.plots = plots
+
 fn fill_region(map, pos, type, visited):
-    region = {}
+    plots = {}
     pending = [pos] 
     while pending.num() > 0:
         pos = pending.pop()
@@ -22,7 +27,7 @@ fn fill_region(map, pos, type, visited):
             continue
         if map.plots[pos] != type:
             continue
-        region.add(pos, nil)
+        plots.add(pos, nil)
         visited.add(pos, nil)
         x = pos[0]
         y = pos[1]
@@ -30,12 +35,21 @@ fn fill_region(map, pos, type, visited):
         pending.add((x, y - 1))
         pending.add((x + 1, y))
         pending.add((x, y + 1))
-    return region
+    return Region(type, plots)
 
-fn count_fences(map, x, y, type):
+fn detect_regions(map):
+    regions = []
+    visited = {}
+    for pos in map.plots:
+        if pos in visited:
+            continue
+        type = map.plots[pos]
+        regions.add(fill_region(map, pos, type, visited))
+    return regions
+
+fn count_fences(region, x, y):
     fn needs_fence(x, y):
-        pos = (x, y)
-        return not map.plots.contains(pos) or map.plots[pos] != type 
+        return not region.plots.contains((x, y))
     num_fences = 0
     num_fences += int(needs_fence(x - 1, y))
     num_fences += int(needs_fence(x, y - 1))
@@ -45,21 +59,68 @@ fn count_fences(map, x, y, type):
 
 export fn part1(input):
     map = Map(input)
-    visited = {}
     price = 0
-    for pos in map.plots:
-        if pos in visited:
-            continue
-        type = map.plots[pos]
-        region = fill_region(map, pos, type, visited)
+    for region in detect_regions(map):
         perimeter = 0
-        for pos in region:
-            perimeter += count_fences(map, pos[0], pos[1], type)
-        price += region.num() * perimeter
+        for pos in region.plots:
+            perimeter += count_fences(region, pos[0], pos[1])
+        price += region.plots.num() * perimeter
     return price
 
+fn count_sides(region, ox, oy):
+    # Find all the plots with a fence in this direction.
+    pending = []
+    fences = {}
+    for pos in region.plots:
+        if not region.plots.contains((pos[0] + ox, pos[1] + oy)):
+            pending.add(pos)
+            fences.add(pos, nil)
+
+    # Search backwards and forwards contiguously along each side,
+    # starting from each fence that we have not yet visited.
+    sides = 0
+    visited = {}
+
+    fn step_backward(pos):
+        return (pos[0] - oy, pos[1] - ox)
+
+    fn step_forward(pos):
+        return (pos[0] + oy, pos[1] + ox)
+
+    while pending.num() > 0:
+        fence = pending.pop()
+        if fence in visited:
+            continue
+
+        # We've found a new side.
+        sides += 1
+        visited.add(fence, nil) 
+
+        # Search backwards along the side.
+        backward = step_backward(fence)
+        while backward in fences:
+            visited.add(backward, nil)
+            backward = step_backward(backward)
+
+        # Search forwards along the side.
+        forward = step_forward(fence)
+        while forward in fences:
+            visited.add(forward, nil)
+            forward = step_forward(forward)
+
+    return sides
+
 export fn part2(input):
-    pass
+    map = Map(input)
+    price = 0
+    for region in detect_regions(map):
+        sides = 0
+        sides += count_sides(region, -1, 0)
+        sides += count_sides(region, 0, -1)
+        sides += count_sides(region, 1, 0)
+        sides += count_sides(region, 0, 1)
+        price += region.plots.num() * sides
+    return price
 
 if is_main():
     aoc.solve(12, part1, part2)

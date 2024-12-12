@@ -83,3 +83,8 @@ import d12
 test(12, 1, d12.part1, 1, 140)
 test(12, 1, d12.part1, 2, 772)
 test(12, 1, d12.part1, 3, 1930)
+test(12, 2, d12.part2, 1, 80)
+test(12, 2, d12.part2, 2, 436)
+test(12, 2, d12.part2, 3, 1206)
+test(12, 2, d12.part2, 4, 236)
+test(12, 2, d12.part2, 5, 368)
