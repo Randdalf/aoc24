@@ -88,3 +88,7 @@ test(12, 2, d12.part2, 2, 436)
 test(12, 2, d12.part2, 3, 1206)
 test(12, 2, d12.part2, 4, 236)
 test(12, 2, d12.part2, 5, 368)
+
+# Day 13
+import d13
+test(13, 1, d13.part1, 1, 480)

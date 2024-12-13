@@ -1,0 +1,35 @@
+import aoc
+import math
+
+button_prelude = "Button A: X+"
+prize_prelude = "Prize: X="
+
+class ButtonOrPrize:
+    init(input, prelude):
+        i = input.find(",")
+        self.x = int(input[prelude.len()...i])
+        self.y = int(input[(i+4)...input.len()])
+
+class Machine:
+    init(input):
+        lines = input.split("\r\n")
+        self.a = ButtonOrPrize(lines[0], button_prelude)
+        self.b = ButtonOrPrize(lines[1], button_prelude)
+        self.p = ButtonOrPrize(lines[2], prize_prelude)
+
+export fn part1(input):
+    tokens = 0
+    for machine_input in input.split("\r\n\r\n"):
+        m = Machine(machine_input)
+        a = (m.p.y * m.b.x - m.p.x * m.b.y) / (m.a.y * m.b.x - m.a.x * m.b.y)
+        if math.trunc(a) != a: continue
+        b = (m.p.x - m.a.x * a) / m.b.x
+        if math.trunc(b) != b: continue
+        tokens += a * 3 + b
+    return tokens
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(13, part1, part2)
