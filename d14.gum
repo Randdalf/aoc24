@@ -1,6 +1,9 @@
 import aoc
 import vec2 for Vec2
 
+export width = 101
+export height = 103
+
 fn parse_vec2(input):
     comps = input[2...input.len()].split(",")
     return Vec2(int(comps[0]), int(comps[1]))
@@ -11,7 +14,7 @@ class Robot:
         self.pos = parse_vec2(parts[0])
         self.vel = parse_vec2(parts[1])
 
-    fn step(width, height):
+    fn step():
         self.pos += self.vel
         while self.pos.x < 0:
             self.pos.x += width
@@ -28,11 +31,11 @@ fn parse_robots(input):
         robots.add(Robot(robot_input))
     return robots
 
-export fn solve(input, width, height):
+export fn part1(input):
     robots = parse_robots(input)
     for sec in 0...100:
         for robot in robots:
-            robot.step(width, height)
+            robot.step()
     mx = (width - 1) / 2
     my = (height - 1) / 2
     quadrants = [0, 0, 0, 0]
@@ -49,11 +52,44 @@ export fn solve(input, width, height):
                 quadrants[3] += 1
     return quadrants[0] * quadrants[1] * quadrants[2] * quadrants[3]
 
-export fn part1(input):
-    return solve(input, 101, 103)
+fn print_robots(robots):
+    counts = {}
+    for robot in robots:
+        pos = robot.pos.tuple()
+        if pos in counts:
+            counts[pos] += 1
+        else:
+            counts.add(pos, 1)
+    for y in 0...height:
+        line = ""
+        for x in 0...width:
+            pos = (x, y)
+            if pos in counts:
+                count = counts[pos]
+                if count > 9:
+                    line += "*"
+                else:
+                    line += "{count}"
+            else:
+                line += "."
+        print(line)
 
 export fn part2(input):
-    pass
+    robots = parse_robots(input)
+    secs = 0
+    while true:
+        counts = {}
+        for robot in robots:
+            robot.step()
+            if not counts: continue
+            pos = robot.pos.tuple()
+            if pos in counts:
+                counts = nil
+            else:
+                counts.add(pos, nil)
+        secs += 1
+        if counts:
+            return secs
 
 if is_main():
     aoc.solve(14, part1, part2)
