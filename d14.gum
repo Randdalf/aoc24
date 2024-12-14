@@ -78,17 +78,12 @@ export fn part2(input):
     robots = parse_robots(input)
     secs = 0
     while true:
-        counts = {}
+        positions = {}
         for robot in robots:
             robot.step()
-            if not counts: continue
-            pos = robot.pos.tuple()
-            if pos in counts:
-                counts = nil
-            else:
-                counts.add(pos, nil)
+            positions.add(robot.pos.tuple(), nil)
         secs += 1
-        if counts:
+        if positions.num() == robots.num():
             return secs
 
 if is_main():
