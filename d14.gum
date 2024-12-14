@@ -1,0 +1,59 @@
+import aoc
+import vec2 for Vec2
+
+fn parse_vec2(input):
+    comps = input[2...input.len()].split(",")
+    return Vec2(int(comps[0]), int(comps[1]))
+
+class Robot:
+    init(input):
+        parts = input.split(" ")
+        self.pos = parse_vec2(parts[0])
+        self.vel = parse_vec2(parts[1])
+
+    fn step(width, height):
+        self.pos += self.vel
+        while self.pos.x < 0:
+            self.pos.x += width
+        while self.pos.x >= width:
+            self.pos.x -= width
+        while self.pos.y < 0:
+            self.pos.y += height
+        while self.pos.y >= height:
+            self.pos.y -= height
+
+fn parse_robots(input):
+    robots = []
+    for robot_input in input.split("\r\n"):
+        robots.add(Robot(robot_input))
+    return robots
+
+export fn solve(input, width, height):
+    robots = parse_robots(input)
+    for sec in 0...100:
+        for robot in robots:
+            robot.step(width, height)
+    mx = (width - 1) / 2
+    my = (height - 1) / 2
+    quadrants = [0, 0, 0, 0]
+    for robot in robots:
+        if robot.pos.x < mx:
+            if robot.pos.y < my:
+                quadrants[0] += 1
+            elif robot.pos.y > my:
+                quadrants[1] += 1
+        elif robot.pos.x > mx:
+            if robot.pos.y < my:
+                quadrants[2] += 1
+            elif robot.pos.y > my:
+                quadrants[3] += 1
+    return quadrants[0] * quadrants[1] * quadrants[2] * quadrants[3]
+
+export fn part1(input):
+    return solve(input, 101, 103)
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(14, part1, part2)

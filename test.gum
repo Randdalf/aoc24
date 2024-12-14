@@ -92,3 +92,8 @@ test(12, 2, d12.part2, 5, 368)
 # Day 13
 import d13
 test(13, 1, d13.part1, 1, 480)
+
+# Day 14
+import d14
+fn d14_part1_test(input): return d14.solve(input, 11, 7)
+test(14, 1, d14_part1_test, 1, 12)

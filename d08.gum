@@ -1,19 +1,5 @@
 import aoc
-
-class Vec2:
-    init(x, y):
-        self.x = x
-        self.y = y
-
-    op +(a, b):
-        return Vec2(a.x + b.x, a.y + b.y)
-
-    op -(a, b):
-        return Vec2(a.x - b.x, a.y - b.y)
-
-    fn tuple():
-        # Instances of classes are not yet hashable, but tuples are.
-        return (self.x, self.y)
+import vec2 for Vec2
 
 class Map:
     init(input):
