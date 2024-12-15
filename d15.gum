@@ -1,0 +1,90 @@
+import aoc
+
+class Warehouse:
+    init(input):
+        parts = input.split("\r\n\r\n")
+        self.parse_map(parts[0])
+        self.parse_moves(parts[1])
+        
+    fn parse_map(input):
+        rows = input.split("\r\n")
+        self.height = rows.num()
+        self.width = rows[0].len()
+        self.walls = {}
+        self.boxes = {}
+        for y in 0...rows.num():
+            row = rows[y]
+            for x in 0...row.len():
+                tile = row[x]
+                if tile == "#":
+                    self.walls.add((x, y), nil)
+                elif tile == "@":
+                    self.robot = (x, y)
+                elif tile == "O":
+                    self.boxes.add((x, y), nil)
+
+    fn parse_moves(input):
+        self.moves = []
+        fn move_right(pos):
+            return (pos[0] + 1, pos[1])
+        fn move_down(pos):
+            return (pos[0], pos[1] + 1)
+        fn move_left(pos):
+            return (pos[0] - 1, pos[1])
+        fn move_up(pos):
+            return (pos[0], pos[1] - 1)
+        for c in input:
+            if c == ">":
+                self.moves.add(move_right)
+            elif c == "v":
+                self.moves.add(move_down)
+            elif c == "<":
+                self.moves.add(move_left)
+            elif c == "^":
+                self.moves.add(move_up)
+                
+    fn print():
+        for y in 0...self.height:
+            line = ""
+            for x in 0...self.width:
+                pos = (x, y)
+                if pos in self.walls:
+                    line += "#"
+                elif pos in self.boxes:
+                    line += "O"
+                elif pos == self.robot:
+                    line += "@"
+                else:
+                    line += "."
+            print(line)
+
+    fn gps_sum():
+        sum = 0
+        for pos in self.boxes:
+            sum += pos[0] + 100 * pos[1]
+        return sum
+
+export fn part1(input):
+    wh = Warehouse(input)
+    fn step(pos, move):
+        return (pos[0] + move[0], pos[1] + move[1])
+    for move in wh.moves:
+        target = move(wh.robot)
+        first_box = nil
+        while target in wh.boxes:
+            if not first_box:
+                first_box = target
+            target = move(target)
+        if target in wh.walls:
+            continue
+        if first_box:
+            wh.boxes.remove(first_box)
+            wh.boxes.add(target, nil)
+        wh.robot = move(wh.robot)
+    return wh.gps_sum()
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(15, part1, part2)
