@@ -103,3 +103,5 @@ test(14, 1, d14.part1, 1, 12)
 import d15
 test(15, 1, d15.part1, 1, 10092)
 test(15, 1, d15.part1, 2, 2028)
+test(15, 2, d15.part2, 1, 9021)
+#test(15, 2, d15.part2, 3, 9021)

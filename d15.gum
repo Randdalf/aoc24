@@ -1,8 +1,21 @@
 import aoc
 
+fn move_right(pos):
+    return (pos[0] + 1, pos[1])
+
+fn move_down(pos):
+    return (pos[0], pos[1] + 1)
+
+fn move_left(pos):
+    return (pos[0] - 1, pos[1])
+
+fn move_up(pos):
+    return (pos[0], pos[1] - 1)
+
 class Warehouse:
-    init(input):
+    init(input, wide):
         parts = input.split("\r\n\r\n")
+        self.wide = wide
         self.parse_map(parts[0])
         self.parse_moves(parts[1])
         
@@ -10,14 +23,17 @@ class Warehouse:
         rows = input.split("\r\n")
         self.height = rows.num()
         self.width = rows[0].len()
+        if self.wide: self.width *= 2
         self.walls = {}
         self.boxes = {}
         for y in 0...rows.num():
             row = rows[y]
             for x in 0...row.len():
                 tile = row[x]
+                if self.wide: x *= 2
                 if tile == "#":
                     self.walls.add((x, y), nil)
+                    if self.wide: self.walls.add((x + 1, y), nil)
                 elif tile == "@":
                     self.robot = (x, y)
                 elif tile == "O":
@@ -25,14 +41,6 @@ class Warehouse:
 
     fn parse_moves(input):
         self.moves = []
-        fn move_right(pos):
-            return (pos[0] + 1, pos[1])
-        fn move_down(pos):
-            return (pos[0], pos[1] + 1)
-        fn move_left(pos):
-            return (pos[0] - 1, pos[1])
-        fn move_up(pos):
-            return (pos[0], pos[1] - 1)
         for c in input:
             if c == ">":
                 self.moves.add(move_right)
@@ -46,17 +54,44 @@ class Warehouse:
     fn print():
         for y in 0...self.height:
             line = ""
-            for x in 0...self.width:
+            x = 0
+            while x < self.width:
                 pos = (x, y)
                 if pos in self.walls:
                     line += "#"
                 elif pos in self.boxes:
-                    line += "O"
+                    if self.wide:
+                        line += "[]"
+                        x += 1
+                    else:
+                        line += "O"
                 elif pos == self.robot:
                     line += "@"
                 else:
                     line += "."
+                x += 1
             print(line)
+
+    fn check_move_box(box, move, boxes):
+        if box in boxes:
+            return true
+        boxes.add(box, nil)
+        if not self.check_move_robot(move(box), move, boxes):
+            return false
+        if not self.check_move_robot(move(move_right(box)), move, boxes):
+            return false
+        return true
+
+    fn check_move_robot(pos, move, boxes):
+        adj = move_left(pos)
+        if pos in self.boxes:
+            return self.check_move_box(pos, move, boxes)
+        elif adj in self.boxes:
+            return self.check_move_box(adj, move, boxes)
+        elif pos in self.walls:
+            return false
+        else:
+            return true
 
     fn gps_sum():
         sum = 0
@@ -65,7 +100,7 @@ class Warehouse:
         return sum
 
 export fn part1(input):
-    wh = Warehouse(input)
+    wh = Warehouse(input, false)
     fn step(pos, move):
         return (pos[0] + move[0], pos[1] + move[1])
     for move in wh.moves:
@@ -84,7 +119,17 @@ export fn part1(input):
     return wh.gps_sum()
 
 export fn part2(input):
-    pass
+    wh = Warehouse(input, true)
+    for move in wh.moves:
+        target = move(wh.robot)
+        boxes = {}
+        if wh.check_move_robot(target, move, boxes):
+            for box in boxes:
+                wh.boxes.remove(box)
+            for box in boxes:
+                wh.boxes.add(move(box), nil)
+            wh.robot = target
+    return wh.gps_sum()
 
 if is_main():
     aoc.solve(15, part1, part2)
