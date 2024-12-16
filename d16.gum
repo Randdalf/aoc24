@@ -99,32 +99,6 @@ class PriorityQueue:
     fn num():
         return self.entries.num()
 
-fn dijkstra(src, goal):
-    q = PriorityQueue()
-    dist = {}
-
-    dist[src.key()] = 0
-    q.push(src, 0)
-
-    while q.num() > 0:
-        current = q.pop()
-        current_dist = dist[current.key()]
-        if goal(current):
-            return current_dist
-        for neighbor in current.get_neighbors():
-            alt = current_dist + current.dist(neighbor)
-            neighbor_key = neighbor.key()
-            if not dist.contains(neighbor_key) or alt < dist[neighbor_key]:
-                dist[neighbor_key] = alt
-                q.push(neighbor, alt)
-
-export fn part1(input):
-    maze = Maze(input)
-    src = Node(maze, maze.start, 0)
-    fn goal(node):
-        return node.pos == maze.end
-    return dijkstra(src, goal)
-
 class BFSResult:
     init(dist, prev):
         self.dist = dist
@@ -154,14 +128,7 @@ fn bfs(src):
 
     return BFSResult(dist, prev)
 
-export fn part2(input):
-    maze = Maze(input)
-
-    # Find the shortest distance from every node to the start.
-    src = Node(maze, maze.start, 0)
-    result = bfs(src)
-
-    # Determine which of the end nodes has the shortest path to the start.
+fn find_best_end(maze, result):
     best_dist = nil
     best_end_key = nil
     for dir in 0...4:
@@ -172,11 +139,21 @@ export fn part2(input):
         if best_dist == nil or end_dist < best_dist:
             best_dist = end_dist
             best_end_key = end_key
-            
-    # Work backwards along the paths found, using depth-first search.
+    return best_end_key
+
+export fn part1(input):
+    maze = Maze(input)
+    src = Node(maze, maze.start, 0)
+    result = bfs(src)
+    return result.dist[find_best_end(maze, result)]
+
+export fn part2(input):
+    maze = Maze(input)
+    src = Node(maze, maze.start, 0)
+    result = bfs(src)
+    best_end_key = find_best_end(maze, result)
     tiles = {}
     stack = [best_end_key]
-
     while stack.num() > 0:
         node = stack.pop()
         tiles.add(node[0], nil)
@@ -184,7 +161,6 @@ export fn part2(input):
             continue
         for prev in result.prev[node]:
             stack.add(prev)
-            
     return tiles.num()
 
 if is_main():
