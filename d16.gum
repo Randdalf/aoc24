@@ -102,7 +102,6 @@ class PriorityQueue:
 fn dijkstra(src, goal):
     q = PriorityQueue()
     dist = {}
-    prev = {}
 
     dist[src.key()] = 0
     q.push(src, 0)
@@ -111,13 +110,12 @@ fn dijkstra(src, goal):
         current = q.pop()
         current_dist = dist[current.key()]
         if goal(current):
-            return dist[current.key()]
+            return current_dist
         for neighbor in current.get_neighbors():
             alt = current_dist + current.dist(neighbor)
             neighbor_key = neighbor.key()
             if not dist.contains(neighbor_key) or alt < dist[neighbor_key]:
                 dist[neighbor_key] = alt
-                prev[neighbor_key] = current
                 q.push(neighbor, alt)
 
 export fn part1(input):
@@ -127,8 +125,67 @@ export fn part1(input):
         return node.pos == maze.end
     return dijkstra(src, goal)
 
+class BFSResult:
+    init(dist, prev):
+        self.dist = dist
+        self.prev = prev
+
+fn bfs(src):
+    q = PriorityQueue()
+    dist = {}
+    prev = {}
+
+    dist[src.key()] = 0
+    q.push(src, 0)
+
+    while q.num() > 0:
+        current = q.pop()
+        current_key = current.key()
+        current_dist = dist[current.key()]
+        for neighbor in current.get_neighbors():
+            alt = current_dist + current.dist(neighbor)
+            neighbor_key = neighbor.key()
+            if not dist.contains(neighbor_key) or alt < dist[neighbor_key]:
+                dist[neighbor_key] = alt
+                prev[neighbor_key] = [current_key]
+                q.push(neighbor, alt)
+            elif alt == dist[neighbor_key]:
+                prev[neighbor_key].add(current_key)
+
+    return BFSResult(dist, prev)
+
 export fn part2(input):
-    pass
+    maze = Maze(input)
+
+    # Find the shortest distance from every node to the start.
+    src = Node(maze, maze.start, 0)
+    result = bfs(src)
+
+    # Determine which of the end nodes has the shortest path to the start.
+    best_dist = nil
+    best_end_key = nil
+    for dir in 0...4:
+        end_key = (maze.end, dir)
+        if not result.prev.contains(end_key):
+            continue
+        end_dist = result.dist[end_key]
+        if best_dist == nil or end_dist < best_dist:
+            best_dist = end_dist
+            best_end_key = end_key
+            
+    # Work backwards along the paths found, using depth-first search.
+    tiles = {}
+    stack = [best_end_key]
+
+    while stack.num() > 0:
+        node = stack.pop()
+        tiles.add(node[0], nil)
+        if not result.prev.contains(node):
+            continue
+        for prev in result.prev[node]:
+            stack.add(prev)
+            
+    return tiles.num()
 
 if is_main():
     aoc.solve(16, part1, part2)

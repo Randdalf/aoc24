@@ -109,3 +109,5 @@ test(15, 2, d15.part2, 1, 9021)
 import d16
 test(16, 1, d16.part1, 1, 7036)
 test(16, 1, d16.part1, 2, 11048)
+test(16, 2, d16.part2, 1, 45)
+test(16, 2, d16.part2, 2, 64)
