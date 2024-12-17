@@ -1,0 +1,77 @@
+import aoc
+import math
+
+class Computer:
+    init(input):
+        fn post_colon(input):
+            return input.split(": ")[1]
+        lines = input.split("\r\n")
+        self.ra = int(post_colon(lines[0]))
+        self.rb = int(post_colon(lines[1]))
+        self.rc = int(post_colon(lines[2]))
+        self.prog = []
+        for x in post_colon(lines[4]).split(","):
+            self.prog.add(int(x))
+
+    fn execute():
+        ip = 0
+        out = []
+
+        fn ins_adv(opr):
+            self.ra = math.trunc(self.ra / math.pow(2, opr))
+        fn ins_bxl(opr):
+            self.rb = math.xor(self.rb, opr)
+        fn ins_bst(opr):
+            self.rb = math.mod(opr, 8)
+        fn ins_jnz(opr):
+            if self.ra != 0: ip = opr - 2
+        fn ins_bxc(opr):
+            self.rb = math.xor(self.rb, self.rc)
+        fn ins_out(opr):
+            out.add("{math.mod(opr, 8)}")
+        fn ins_bdv(opr):
+            self.rb = math.trunc(self.ra / math.pow(2, opr))
+        fn ins_cdv(opr):
+            self.rc = math.trunc(self.ra / math.pow(2, opr))
+
+        instrs = [
+            ins_adv, ins_bxl, ins_bst, ins_jnz,
+            ins_bxc, ins_out, ins_bdv, ins_cdv
+        ]
+
+        fn opr_0():
+            return 0
+        fn opr_1():
+            return 1
+        fn opr_2():
+            return 2
+        fn opr_3():
+            return 3
+        fn opr_a():
+            return self.ra
+        fn opr_b():
+            return self.rb
+        fn opr_c():
+            return self.rc
+
+        operands = [
+            opr_0, opr_1, opr_2, opr_3,
+            opr_a, opr_b, opr_c, nil
+        ]
+
+        while ip < self.prog.num():
+            ins = instrs[self.prog[ip]]
+            opr = operands[self.prog[ip + 1]]
+            ins(opr())
+            ip += 2
+
+        return ",".join(out)
+
+export fn part1(input):
+    return Computer(input).execute()
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(17, part1, part2)
