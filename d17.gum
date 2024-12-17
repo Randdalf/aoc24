@@ -1,5 +1,6 @@
 import aoc
 import math
+import random
 
 class Computer:
     init(input):
@@ -13,26 +14,31 @@ class Computer:
         for x in post_colon(lines[4]).split(","):
             self.prog.add(int(x))
 
-    fn execute():
+    fn execute(ra_override):
         ip = 0
         out = []
+        ra = self.ra
+        if ra_override != nil:
+            ra = ra_override
+        rb = self.rb
+        rc = self.rc
 
         fn ins_adv(opr):
-            self.ra = math.trunc(self.ra / math.pow(2, opr))
+            ra = math.trunc(ra / math.pow(2, opr))
         fn ins_bxl(opr):
-            self.rb = math.xor(self.rb, opr)
+            rb = math.xor(rb, opr)
         fn ins_bst(opr):
-            self.rb = math.mod(opr, 8)
+            rb = math.mod(opr, 8)
         fn ins_jnz(opr):
-            if self.ra != 0: ip = opr - 2
+            if ra != 0: ip = opr - 2
         fn ins_bxc(opr):
-            self.rb = math.xor(self.rb, self.rc)
+            rb = math.xor(rb, rc)
         fn ins_out(opr):
-            out.add("{math.mod(opr, 8)}")
+            out.add(math.mod(opr, 8))
         fn ins_bdv(opr):
-            self.rb = math.trunc(self.ra / math.pow(2, opr))
+            rb = math.trunc(ra / math.pow(2, opr))
         fn ins_cdv(opr):
-            self.rc = math.trunc(self.ra / math.pow(2, opr))
+            rc = math.trunc(ra / math.pow(2, opr))
 
         instrs = [
             ins_adv, ins_bxl, ins_bst, ins_jnz,
@@ -48,11 +54,11 @@ class Computer:
         fn opr_3():
             return 3
         fn opr_a():
-            return self.ra
+            return ra
         fn opr_b():
-            return self.rb
+            return rb
         fn opr_c():
-            return self.rc
+            return rc
 
         operands = [
             opr_0, opr_1, opr_2, opr_3,
@@ -65,10 +71,14 @@ class Computer:
             ins(opr())
             ip += 2
 
-        return ",".join(out)
+        return out
 
 export fn part1(input):
-    return Computer(input).execute()
+    fn add_commas(out):
+        for i in 0...out.num():
+            out[i] = "{out[i]}"
+        return ",".join(out)
+    return add_commas(Computer(input).execute(nil))
 
 export fn part2(input):
     pass
