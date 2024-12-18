@@ -122,3 +122,4 @@ import d18
 d18.fallen = 12
 d18.size = 6
 test(18, 1, d18.part1, 1, 22)
+test(18, 2, d18.part2, 1, "6,1")
