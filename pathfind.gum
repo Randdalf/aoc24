@@ -1,0 +1,30 @@
+import pqueue for PriorityQueue
+
+class BFSResult:
+    init(dist, prev):
+        self.dist = dist
+        self.prev = prev
+
+export fn bfs(src):
+    q = PriorityQueue()
+    dist = {}
+    prev = {}
+
+    dist[src.key()] = 0
+    q.push(src, 0)
+
+    while q.num() > 0:
+        current = q.pop()
+        current_key = current.key()
+        current_dist = dist[current.key()]
+        for neighbor in current.get_neighbors():
+            alt = current_dist + current.dist(neighbor)
+            neighbor_key = neighbor.key()
+            if not dist.contains(neighbor_key) or alt < dist[neighbor_key]:
+                dist[neighbor_key] = alt
+                prev[neighbor_key] = [current_key]
+                q.push(neighbor, alt)
+            elif alt == dist[neighbor_key]:
+                prev[neighbor_key].add(current_key)
+
+    return BFSResult(dist, prev)

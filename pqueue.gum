@@ -1,0 +1,42 @@
+import math
+
+export class PriorityQueue:
+    init():
+        self.entries = []
+
+    fn push(node, dist):
+        fn parent(i):
+            return math.trunc((i - 1) / 2)
+        i = self.entries.num()
+        j = parent(i)
+        self.entries.add(nil)
+        while i > 0 and self.entries[j][1] > dist:
+            self.entries[i] = self.entries[j]
+            i = j
+            j = parent(i)
+        self.entries[i] = (node, dist)
+
+    fn pop():
+        if self.entries.num() == 1:
+            return self.entries.pop()[0]
+        node = self.entries[0][0]
+        self.entries[0] = self.entries.pop()
+        i = 0
+        while true:
+            min = i
+            left = 2 * i + 1
+            if left < self.entries.num() and self.entries[left][1] < self.entries[min][1]:
+                min = left
+            right = left + 1
+            if right < self.entries.num() and self.entries[right][1] < self.entries[min][1]:
+                min = right
+            if i == min:
+                break
+            temp = self.entries[min]
+            self.entries[min] = self.entries[i]
+            self.entries[i] = temp
+            i = min
+        return node
+
+    fn num():
+        return self.entries.num()

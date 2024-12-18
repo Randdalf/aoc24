@@ -1,0 +1,52 @@
+import aoc
+import pathfind for bfs
+
+export fallen = 1024
+export size = 70
+
+class Space:
+    init(input):
+        self.corrupted = {}
+        lines = input.split("\r\n")
+        for i in 0...fallen:
+            parts = lines[i].split(",")
+            x = int(parts[0])
+            y = int(parts[1])
+            self.corrupted.add((x, y), nil)
+
+class Node:
+    init(space, pos):
+        self.space = space
+        self.pos = pos
+
+    fn get_neighbors():
+        neighbors = []
+        fn add_if_valid(pos):
+            if pos in self.space.corrupted:
+                return
+            neighbors.add(Node(self.space, pos))
+        x = self.pos[0]
+        y = self.pos[1]
+        if x > 0: add_if_valid((x - 1, y))
+        if y > 0: add_if_valid((x, y - 1))
+        if x < size: add_if_valid((x + 1, y))
+        if y < size: add_if_valid((x, y + 1))
+        return neighbors
+    
+    fn dist(neighbor):
+        return 1
+
+    fn key():
+        return self.pos
+
+export fn part1(input):
+    space = Space(input)
+    node = Node(space, (0, 0))
+    result = bfs(node)
+    return result.dist[(size, size)]
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(18, part1, part2)

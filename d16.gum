@@ -1,5 +1,6 @@
 import aoc
 import math
+import pathfind for bfs
 
 xform_cw = [1, 2, 3, 0]
 xform_ccw = [3, 0, 1, 2]
@@ -57,76 +58,6 @@ class Node:
     fn key():
         # Instances aren't hashable (yet).
         return (self.pos, self.dir)
-
-class PriorityQueue:
-    init():
-        self.entries = []
-
-    fn push(node, dist):
-        fn parent(i):
-            return math.trunc((i - 1) / 2)
-        i = self.entries.num()
-        j = parent(i)
-        self.entries.add(nil)
-        while i > 0 and self.entries[j][1] > dist:
-            self.entries[i] = self.entries[j]
-            i = j
-            j = parent(i)
-        self.entries[i] = (node, dist)
-
-    fn pop():
-        if self.entries.num() == 1:
-            return self.entries.pop()[0]
-        node = self.entries[0][0]
-        self.entries[0] = self.entries.pop()
-        i = 0
-        while true:
-            min = i
-            left = 2 * i + 1
-            if left < self.entries.num() and self.entries[left][1] < self.entries[min][1]:
-                min = left
-            right = left + 1
-            if right < self.entries.num() and self.entries[right][1] < self.entries[min][1]:
-                min = right
-            if i == min:
-                break
-            temp = self.entries[min]
-            self.entries[min] = self.entries[i]
-            self.entries[i] = temp
-            i = min
-        return node
-
-    fn num():
-        return self.entries.num()
-
-class BFSResult:
-    init(dist, prev):
-        self.dist = dist
-        self.prev = prev
-
-fn bfs(src):
-    q = PriorityQueue()
-    dist = {}
-    prev = {}
-
-    dist[src.key()] = 0
-    q.push(src, 0)
-
-    while q.num() > 0:
-        current = q.pop()
-        current_key = current.key()
-        current_dist = dist[current.key()]
-        for neighbor in current.get_neighbors():
-            alt = current_dist + current.dist(neighbor)
-            neighbor_key = neighbor.key()
-            if not dist.contains(neighbor_key) or alt < dist[neighbor_key]:
-                dist[neighbor_key] = alt
-                prev[neighbor_key] = [current_key]
-                q.push(neighbor, alt)
-            elif alt == dist[neighbor_key]:
-                prev[neighbor_key].add(current_key)
-
-    return BFSResult(dist, prev)
 
 fn find_best_end(maze, result):
     best_dist = nil
