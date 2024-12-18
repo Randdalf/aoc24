@@ -81,7 +81,32 @@ export fn part1(input):
     return add_commas(Computer(input).execute(nil))
 
 export fn part2(input):
-    pass
+    comp = Computer(input)
+
+    # Increment mismatched octal digits until the result matches the program.
+    fn oct_to_dec(oct):
+        dec = 0
+        for d in oct:
+            dec = dec * 8 + d
+        return dec
+    
+    oct = []
+    for i in 0...comp.prog.num():
+        oct.add(0)
+    oct[0] = 1
+
+    out = comp.execute(oct_to_dec(oct))
+    k = 0
+    target = comp.prog
+    n = target.num()
+    while comp.prog != out:
+        i = n - 1
+        while comp.prog[i] == out[i]:
+            i -= 1
+        oct[n - i - 1] += 1
+        out = comp.execute(oct_to_dec(oct))
+    
+    return oct_to_dec(oct)
 
 if is_main():
     aoc.solve(17, part1, part2)
