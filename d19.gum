@@ -1,0 +1,33 @@
+import aoc
+
+fn is_possible(cache, design, patterns):
+    if design in cache:
+        return cache[design]
+    fn save(result):
+        cache[design] = result
+        return result
+    if design.len() == 0:
+        return true
+    for pattern in patterns:
+        if not design.starts_with(pattern):
+            continue
+        subdesign = design[pattern.len()...design.len()]
+        if not is_possible(cache, subdesign, patterns):
+            continue
+        return save(true)
+    return save(false)
+
+export fn part1(input):
+    lines = input.split("\r\n")
+    patterns = lines[0].split(", ")
+    designs = lines[2...lines.num()]
+    possible = 0
+    for design in designs:
+        possible += int(is_possible({}, design, patterns))
+    return possible
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(19, part1, part2)
