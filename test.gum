@@ -127,3 +127,4 @@ test(18, 2, d18.part2, 1, "6,1")
 # Day 19
 import d19
 test(19, 1, d19.part1, 1, 6)
+test(19, 2, d19.part2, 1, 16)
