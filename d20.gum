@@ -103,7 +103,7 @@ export fn part1(input):
     savings = 0
     for start in dists:
         cheats = []
-        find_cheats(track, cheats, start, 20)
+        find_cheats(track, cheats, start, 2)
         for cheat in cheats:
             saving = dists[cheat] - dists[start] - 2
             if saving >= 100:
