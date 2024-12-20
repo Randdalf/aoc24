@@ -1,0 +1,120 @@
+import aoc
+import pathfind for dijkstra
+
+class Racetrack:
+    init(input):
+        rows = input.split("\r\n")
+        self.height = rows.num()
+        self.width = rows[0].len()
+        self.walls = {}
+        for y in 0...self.height:
+            row = rows[y]
+            for x in 0...self.width:
+                tile = row[x]
+                if tile == "#":
+                    self.walls.add((x, y), nil)
+                elif tile == "S":
+                    self.start = (x, y)
+                elif tile == "E":
+                    self.end = (x, y)
+
+fn move_right(pos):
+    return (pos[0] + 1, pos[1])
+
+fn move_down(pos):
+    return (pos[0], pos[1] + 1)
+
+fn move_left(pos):
+    return (pos[0] - 1, pos[1])
+
+fn move_up(pos):
+    return (pos[0], pos[1] - 1)
+
+fn inside_track(track, pos):
+    if pos[0] < 0 or pos[0] >= track.width:
+        return false
+    if pos[1] < 0 or pos[1] >= track.height:
+        return false
+    return true
+
+fn traverse(track):
+    visited = {}
+    dists = {}
+
+    fn can_traverse(track, pos):
+        if pos in track.walls:
+            return false
+        if pos in visited:
+            return false
+        return inside_track(track, pos)
+
+    pos = track.start
+    dist = 0
+    while pos != nil:
+        # Interpreter bug: if we query dists in can_traverse, when iterating
+        # over it later, the value of particular keys cannot be found. Using
+        # a separate dict works around this.
+        visited.add(pos, nil)
+        dists.add(pos, dist)
+        dist += 1
+
+        right = move_right(pos)
+        down = move_down(pos)
+        left = move_left(pos)
+        up = move_up(pos)
+
+        if can_traverse(track, right):
+            pos = right
+        elif can_traverse(track, down):
+            pos = down
+        elif can_traverse(track, left):
+            pos = left
+        elif can_traverse(track, up):
+            pos = up
+        else:
+            pos = nil
+
+    return dists
+
+fn find_cheats(track, cheats, pos, rem):
+    if rem == 0:
+        if not track.walls.contains(pos):
+            cheats.add(pos)
+        return
+
+    right = move_right(pos)
+    if inside_track(track, right):
+        find_cheats(track, cheats, right, rem - 1)
+
+    down = move_down(pos)
+    if inside_track(track, down):
+        find_cheats(track, cheats, down, rem - 1)
+
+    left = move_left(pos)
+    if inside_track(track, left):
+        find_cheats(track, cheats, left, rem - 1)
+
+    up = move_up(pos)
+    if inside_track(track, up):
+        find_cheats(track, cheats, up, rem - 1)
+
+export fn part1(input):
+    track = Racetrack(input)
+    dists = traverse(track)
+    savings = 0
+    for start in dists:
+        cheats = []
+        find_cheats(track, cheats, start, 2)
+        for cheat in cheats:
+            saving = dists[cheat] - dists[start] - 2
+            if saving >= 100:
+                savings += 1
+    return savings
+
+export fn part2(input):
+    pass
+
+if is_main():
+    import io for read_file_text
+    #part1(read_file_text("examples/d20_e1.txt"))
+    aoc.solve(20, part1, part2)
