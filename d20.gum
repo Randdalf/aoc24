@@ -1,5 +1,5 @@
 import aoc
-import math for abs, is_even
+import math for abs
 
 export saving_target = 100
 
@@ -40,23 +40,18 @@ fn inside_track(track, pos):
     return true
 
 fn traverse(track):
-    visited = {}
     dists = {}
 
     fn can_traverse(track, pos):
         if pos in track.walls:
             return false
-        if pos in visited:
+        if pos in dists:
             return false
         return inside_track(track, pos)
 
     pos = track.start
     dist = 0
     while pos != nil:
-        # Interpreter bug: if we query dists in can_traverse, when iterating
-        # over it later, the value of particular keys cannot be found. Using
-        # a separate dict works around this.
-        visited.add(pos, nil)
         dists.add(pos, dist)
         dist += 1
 
@@ -86,11 +81,12 @@ fn solve(input, ps):
     dists = traverse(track)
     good_cheats = 0
     for start in dists:
-        cheats = []
-        for pos in dists:
-            if manhattan(start, pos) <= ps: # TODO: can only land on squares which are odd/even depending on ps
-                if dists[pos] - dists[start] - ps >= saving_target:
-                    good_cheats += 1
+        for end in dists:
+            dist = manhattan(start, end)
+            if dist > ps: continue
+            saving = dists[end] - dists[start] - dist
+            if saving < saving_target: continue
+            good_cheats += 1
     return good_cheats
 
 export fn part1(input):
@@ -100,5 +96,4 @@ export fn part2(input):
     return solve(input, 20)
 
 if is_main():
-    import io for read_file_text
     aoc.solve(20, part1, part2)
