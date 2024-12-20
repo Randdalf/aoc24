@@ -40,20 +40,20 @@ fn inside_track(track, pos):
     return true
 
 fn traverse(track):
-    dists = {}
+    visited = {}
+    path = []
 
     fn can_traverse(track, pos):
         if pos in track.walls:
             return false
-        if pos in dists:
+        if pos in visited:
             return false
         return inside_track(track, pos)
 
     pos = track.start
-    dist = 0
     while pos != nil:
-        dists.add(pos, dist)
-        dist += 1
+        visited.add(pos, nil)
+        path.add(pos)
 
         right = move_right(pos)
         down = move_down(pos)
@@ -71,20 +71,24 @@ fn traverse(track):
         else:
             pos = nil
 
-    return dists
+    return path
 
 fn manhattan(a, b):
     return abs(b[0] - a[0]) + abs(b[1] - a[1])
 
 fn solve(input, ps):
     track = Racetrack(input)
-    dists = traverse(track)
+    path = traverse(track)
     good_cheats = 0
-    for start in dists:
-        for end in dists:
+    for i in 0...path.num():
+        start = path[i]
+        j_start = i + 1 + ps
+        if j_start >= path.num(): continue
+        for j in j_start...path.num():
+            end = path[j]
             dist = manhattan(start, end)
             if dist > ps: continue
-            saving = dists[end] - dists[start] - dist
+            saving = j - i - dist
             if saving < saving_target: continue
             good_cheats += 1
     return good_cheats
