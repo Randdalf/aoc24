@@ -1,4 +1,7 @@
 import aoc
+import math for abs, is_even
+
+export saving_target = 100
 
 class Racetrack:
     init(input):
@@ -75,45 +78,27 @@ fn traverse(track):
 
     return dists
 
-fn find_cheats(track, cheats, pos, rem):
-    if rem == 0:
-        if not track.walls.contains(pos):
-            cheats.add(pos)
-        return
+fn manhattan(a, b):
+    return abs(b[0] - a[0]) + abs(b[1] - a[1])
 
-    right = move_right(pos)
-    if inside_track(track, right):
-        find_cheats(track, cheats, right, rem - 1)
-
-    down = move_down(pos)
-    if inside_track(track, down):
-        find_cheats(track, cheats, down, rem - 1)
-
-    left = move_left(pos)
-    if inside_track(track, left):
-        find_cheats(track, cheats, left, rem - 1)
-
-    up = move_up(pos)
-    if inside_track(track, up):
-        find_cheats(track, cheats, up, rem - 1)
-
-export fn part1(input):
+fn solve(input, ps):
     track = Racetrack(input)
     dists = traverse(track)
-    savings = 0
+    good_cheats = 0
     for start in dists:
         cheats = []
-        find_cheats(track, cheats, start, 2)
-        for cheat in cheats:
-            saving = dists[cheat] - dists[start] - 2
-            if saving >= 100:
-                savings += 1
-    return savings
+        for pos in dists:
+            if manhattan(start, pos) <= ps: # TODO: can only land on squares which are odd/even depending on ps
+                if dists[pos] - dists[start] - ps >= saving_target:
+                    good_cheats += 1
+    return good_cheats
+
+export fn part1(input):
+    return solve(input, 2)
 
 export fn part2(input):
-    pass
+    return solve(input, 20)
 
 if is_main():
     import io for read_file_text
-    #part1(read_file_text("examples/d20_e1.txt"))
     aoc.solve(20, part1, part2)
