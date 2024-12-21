@@ -135,3 +135,7 @@ d20.saving_target = 1
 test(20, 1, d20.part1, 1, 44)
 d20.saving_target = 50
 test(20, 2, d20.part2, 1, 285)
+
+# Day 21
+import d21
+test(21, 1, d21.part1, 1, 126384)

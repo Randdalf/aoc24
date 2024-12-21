@@ -28,3 +28,23 @@ export fn bfs(src):
                 prev[neighbor_key].add(current_key)
 
     return BFSResult(dist, prev)
+
+export fn dijkstra(src, goal):
+    q = PriorityQueue()
+    dist = {}
+
+    dist[src.key()] = 0
+    q.push(src, 0)
+
+    while q.num() > 0:
+        current = q.pop()
+        current_key = current.key()
+        if goal(current):
+            return dist[current_key]
+        current_dist = dist[current.key()]
+        for neighbor in current.get_neighbors():
+            alt = current_dist + current.dist(neighbor)
+            neighbor_key = neighbor.key()
+            if not dist.contains(neighbor_key) or alt < dist[neighbor_key]:
+                dist[neighbor_key] = alt
+                q.push(neighbor, alt)

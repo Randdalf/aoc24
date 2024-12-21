@@ -1,0 +1,126 @@
+import aoc
+import pathfind for dijkstra
+
+# Note: No symbol() function exists yet in the core library!
+string_to_symbol = {
+    "0": '0', "1": '1', "2": '2', "3": '3', "4": '4',
+    "5": '5', "6": '6', "7": '7', "8": '8', "9": '9',
+    "A": 'A', ">": '>', "v": 'v', "<": '<', "^": '^'
+}
+
+num_keypad = "789\n456\n123\n.0A"
+dir_keypad = ".^A\n<v>"
+
+fn move_right(pos):
+    return (pos[0] + 1, pos[1])
+
+fn move_down(pos):
+    return (pos[0], pos[1] + 1)
+
+fn move_left(pos):
+    return (pos[0] - 1, pos[1])
+
+fn move_up(pos):
+    return (pos[0], pos[1] - 1)
+
+fn expand_keypad(keypad):
+    rows = keypad.split("\n")
+    positions = {}
+    for y in 0...rows.num():
+        row = rows[y]
+        for x in 0...row.len():
+            key = row[x]
+            if key == ".": continue
+            positions.add((x, y), string_to_symbol[row[x]])
+    expanded = {}
+    fn add_if_valid(pos, key, dir):
+        if pos in positions:
+            expanded.add((key, dir), positions[pos])
+    for pos in positions:
+        key = positions[pos]
+        add_if_valid(move_right(pos), key, '>')
+        add_if_valid(move_down(pos), key, 'v')
+        add_if_valid(move_left(pos), key, '<')
+        add_if_valid(move_up(pos), key, '^')
+    return expanded
+
+num_keypad = expand_keypad(num_keypad)
+dir_keypad = expand_keypad(dir_keypad)
+
+fn adj_key(keypad, key, dir):
+    pair = (key, dir)
+    if pair in keypad:
+        return keypad[pair]
+
+class Node:
+    init(dk1, dk2, nk):
+        self.dk1 = dk1
+        self.dk2 = dk2
+        self.nk = nk
+
+    fn get_neighbors():
+        neighbors = []
+
+        # Press >
+        dk1 = adj_key(dir_keypad, self.dk1, '>')
+        if dk1 != nil:
+            neighbors.add(Node(dk1, self.dk2, self.nk))
+
+        # Press v
+        dk1 = adj_key(dir_keypad, self.dk1, 'v')
+        if dk1 != nil:
+            neighbors.add(Node(dk1, self.dk2, self.nk))
+
+        # Press <
+        dk1 = adj_key(dir_keypad, self.dk1, '<')
+        if dk1 != nil:
+            neighbors.add(Node(dk1, self.dk2, self.nk))
+
+        # Press ^
+        dk1 = adj_key(dir_keypad, self.dk1, '^')
+        if dk1 != nil:
+            neighbors.add(Node(dk1, self.dk2, self.nk))
+
+        # Press A
+        if self.dk1 == 'A':
+            nk = adj_key(num_keypad, self.nk, self.dk2)
+            if nk != nil:
+                neighbors.add(Node(self.dk1, self.dk2, nk))
+        else:
+            dk2 = adj_key(dir_keypad, self.dk2, self.dk1)
+            if dk2 != nil:
+                neighbors.add(Node(self.dk1, dk2, self.nk))
+
+        return neighbors
+
+    fn dist(neighbor):
+        return 1
+
+    fn key():
+        return (self.dk1, self.dk2, self.nk)
+
+fn find_shortest_length(code):
+    length = 0
+    prev = 'A'
+    for c in code:
+        key = string_to_symbol[c]
+        start = Node('A', 'A', prev)
+        end = ('A', 'A', key)
+        fn goal(node): return node.key() == end
+        length += 1 + dijkstra(start, goal)
+        prev = key
+    return length
+
+export fn part1(input):
+    sum = 0
+    for code in input.split("\r\n"):
+        length = find_shortest_length(code)
+        numeric = int(code[0...(code.len()-1)])
+        sum += length * numeric
+    return sum
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(21, part1, part2)
