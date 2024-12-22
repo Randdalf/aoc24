@@ -1,0 +1,25 @@
+import aoc
+import math
+
+fn simulate(n, iters):
+    fn mix_prune(a, b):
+        return math.mod(math.xor(a, b), 16777216)
+
+    for i in 0...iters:
+        n = mix_prune(n, 64 * n)
+        n = mix_prune(n, math.trunc(n / 32))
+        n = mix_prune(n, 2048 * n)
+    
+    return n
+
+export fn part1(input):
+    sum = 0
+    for line in input.split("\r\n"):
+        sum += simulate(int(line), 2000)
+    return sum
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(22, part1, part2)
