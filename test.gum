@@ -143,3 +143,4 @@ test(21, 1, d21.part1, 1, 126384)
 # Day 22
 import d22
 test(22, 1, d22.part1, 1, 37327623)
+test(22, 2, d22.part2, 2, 23)

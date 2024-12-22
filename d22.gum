@@ -1,25 +1,76 @@
 import aoc
 import math
 
-fn simulate(n, iters):
-    fn mix_prune(a, b):
-        return math.mod(math.xor(a, b), 16777216)
+fn parse(input):
+    numbers = []
+    for line in input.split("\r\n"):
+        numbers.add(int(line))
+    return numbers
 
-    for i in 0...iters:
-        n = mix_prune(n, 64 * n)
-        n = mix_prune(n, math.trunc(n / 32))
-        n = mix_prune(n, 2048 * n)
-    
-    return n
+fn mix_prune(a, b):
+    return math.mod(math.xor(a, b), 16777216)
+
+fn evolve(n):
+    n = mix_prune(n, 64 * n)
+    n = mix_prune(n, math.trunc(n / 32))
+    return mix_prune(n, 2048 * n)
 
 export fn part1(input):
     sum = 0
-    for line in input.split("\r\n"):
-        sum += simulate(int(line), 2000)
+    for n in parse(input):
+        for i in 0...2000:
+            n = evolve(n)
+        sum += n
     return sum
 
 export fn part2(input):
-    pass
+    bananas = {}
+
+    # Store ordinals instead of tuples to reduce memory pressure (which is causing a crash bug!)
+    fn ordinal(a, b, c, d):
+        o = a + 9
+        o = 100 * o + b + 10
+        o = 100 * o + c + 10
+        o = 100 * o + d + 10
+        return o
+
+    # Reusable memory for changes and prices.
+    changes = []
+    prices = []
+    for i in 0...2000:
+        changes.add(nil)
+        prices.add(nil)
+
+    for n in parse(input):
+        # Record all the prices and changes.
+        prev = math.mod(n, 10)
+        for i in 0...2000:
+            n = evolve(n)
+            price = math.mod(n, 10)
+            changes[i] = price - prev
+            prices[i] = price
+            prev = price
+
+        # Find the highest price for the first occurrence of each sequence of four changes.
+        first = {}
+        for i in 3...changes.num():
+            seq = ordinal(changes[i-3], changes[i-2], changes[i-1], changes[i])
+            price = prices[i]
+            if not (seq in first):
+                first[seq] = price
+
+        # Sum with the overall sequence scores.
+        for seq in first:
+            if seq in bananas:
+                bananas[seq] += first[seq]
+            else:
+                bananas[seq] = first[seq]
+
+    # Find the sequence which generates the most bananas!
+    most = 0
+    for seq in bananas:
+        most = math.max(most, bananas[seq])
+    return most
 
 if is_main():
     aoc.solve(22, part1, part2)
