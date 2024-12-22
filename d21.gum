@@ -47,80 +47,73 @@ fn expand_keypad(keypad):
 num_keypad = expand_keypad(num_keypad)
 dir_keypad = expand_keypad(dir_keypad)
 
-fn adj_key(keypad, key, dir):
-    pair = (key, dir)
-    if pair in keypad:
-        return keypad[pair]
+keypad_dist_cache = {}
 
-class Node:
-    init(dk1, dk2, nk):
-        self.dk1 = dk1
-        self.dk2 = dk2
-        self.nk = nk
+fn keypad_dist(keypad, start, end, depth):
+    cache_key = (start, end, depth)
+    if cache_key in keypad_dist_cache:
+        return keypad_dist_cache[cache_key]
 
-    fn get_neighbors():
-        neighbors = []
+    class Node:
+        init(outer, inner, output):
+            self.outer = outer
+            self.inner = inner
+            self.output = output
 
-        # Press >
-        dk1 = adj_key(dir_keypad, self.dk1, '>')
-        if dk1 != nil:
-            neighbors.add(Node(dk1, self.dk2, self.nk))
+        fn get_neighbors():
+            neighbors = []
 
-        # Press v
-        dk1 = adj_key(dir_keypad, self.dk1, 'v')
-        if dk1 != nil:
-            neighbors.add(Node(dk1, self.dk2, self.nk))
+            fn add_neighbor_dir(key):
+                pair = (self.inner, key)
+                if pair in keypad:
+                    neighbors.add(Node(key, keypad[pair], nil))
 
-        # Press <
-        dk1 = adj_key(dir_keypad, self.dk1, '<')
-        if dk1 != nil:
-            neighbors.add(Node(dk1, self.dk2, self.nk))
+            add_neighbor_dir('>')
+            add_neighbor_dir('v')
+            add_neighbor_dir('<')
+            add_neighbor_dir('^')
+            neighbors.add(Node('A', self.inner, self.inner))
 
-        # Press ^
-        dk1 = adj_key(dir_keypad, self.dk1, '^')
-        if dk1 != nil:
-            neighbors.add(Node(dk1, self.dk2, self.nk))
+            return neighbors
 
-        # Press A
-        if self.dk1 == 'A':
-            nk = adj_key(num_keypad, self.nk, self.dk2)
-            if nk != nil:
-                neighbors.add(Node(self.dk1, self.dk2, nk))
-        else:
-            dk2 = adj_key(dir_keypad, self.dk2, self.dk1)
-            if dk2 != nil:
-                neighbors.add(Node(self.dk1, dk2, self.nk))
+        fn dist(neighbor):
+            if depth > 0:
+               return keypad_dist(dir_keypad, self.outer, neighbor.outer, depth - 1)
+            else:
+               return 1
 
-        return neighbors
+        fn key():
+            return (self.outer, self.inner, self.output)
 
-    fn dist(neighbor):
-        return 1
+    fn goal(node):
+        return node.output == end
 
-    fn key():
-        return (self.dk1, self.dk2, self.nk)
+    dist = dijkstra(Node('A', start, nil), goal)
+    keypad_dist_cache.add(cache_key, dist)
+    return dist
 
-fn find_shortest_length(code):
+fn find_shortest_length(code, depth):
     length = 0
     prev = 'A'
     for c in code:
         key = string_to_symbol[c]
-        start = Node('A', 'A', prev)
-        end = ('A', 'A', key)
-        fn goal(node): return node.key() == end
-        length += 1 + dijkstra(start, goal)
+        length += keypad_dist(num_keypad, prev, key, depth)
         prev = key
     return length
 
-export fn part1(input):
+export fn solve(input, depth):
     sum = 0
     for code in input.split("\r\n"):
-        length = find_shortest_length(code)
+        length = find_shortest_length(code, depth)
         numeric = int(code[0...(code.len()-1)])
         sum += length * numeric
     return sum
 
+export fn part1(input):
+    return solve(input, 2)
+
 export fn part2(input):
-    pass
+    return solve(input, 25)
 
 if is_main():
     aoc.solve(21, part1, part2)
