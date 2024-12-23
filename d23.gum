@@ -96,6 +96,5 @@ export fn part2(input):
 
     return ",".join(best_vertices)
 
-
 if is_main():
     aoc.solve(23, part1, part2)
