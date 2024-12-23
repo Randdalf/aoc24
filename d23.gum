@@ -1,41 +1,47 @@
 import aoc
+import math
 import sort for sort
 
-fn intersect(a, b):
-    intersection = {}
-    for node in a:
-        if node in b:
-            intersection.add(node, nil)
-    return intersection
-
-export fn part1(input):
-    connections = {}
+fn parse_graph(input):
+    graph = {}
 
     fn add_connection(from, to):
-        if from in connections:
-            connections[from].add(to, nil)
+        if from in graph:
+            graph[from].add(to, nil)
         else:
-            connections[from] = {to: nil}
+            graph[from] = {to: nil}
 
     for line in input.split("\r\n"):
         pair = line.split("-")
         add_connection(pair[0], pair[1])
         add_connection(pair[1], pair[0])
 
+    return graph
 
+fn intersect(a, b):
+    intersection = {}
+    for vertex in a:
+        if vertex in b:
+            intersection.add(vertex, nil)
+    return intersection
+
+export fn part1(input):
+    graph = parse_graph(input)
+
+    # Find and deduplicate all interconnected triplets.
     triplets = {}
-
-    for a in connections:
-        for b in connections[a]:
-            for c in intersect(connections[a], connections[b]):
+    for a in graph:
+        for b in graph[a]:
+            for c in intersect(graph[a], graph[b]):
                 triplet = [a, b, c]
                 sort(triplet)
                 triplets.add((triplet[0], triplet[1], triplet[2]), nil)
 
-    fn has_t(node):
-        return node.starts_with("t")
-
+    # Count all the triplets which start with "t".
     count = 0
+
+    fn has_t(vertex):
+        return vertex.starts_with("t")
 
     for triplet in triplets:
         if has_t(triplet[0]) or has_t(triplet[1]) or has_t(triplet[2]):
@@ -44,7 +50,52 @@ export fn part1(input):
     return count
 
 export fn part2(input):
-    pass
+    graph = parse_graph(input)
+
+    best_degree = nil
+    best_subgraph = nil
+
+    for root in graph:
+        # Form a subgraph off this vertex.
+        subgraph = {}
+        for vertex in graph[root]:
+            subgraph.add(vertex, nil)
+        subgraph.add(root, nil)
+
+        # Remove vertices from the graph until it is complete.
+        while true:
+            lo_vertices = []
+            lo_degree = nil
+            hi_degree = nil
+
+            for vertex in subgraph:
+                degree = 0
+                for adj in graph[vertex]:
+                    degree += int(adj in subgraph)
+                if lo_degree == nil or degree < lo_degree:
+                    lo_degree = degree
+                    lo_vertices = [vertex]
+                elif degree == lo_degree:
+                    lo_vertices.add(vertex)
+                if hi_degree == nil or degree > hi_degree:
+                    hi_degree = degree
+
+            if lo_degree == hi_degree:
+                if best_degree == nil or lo_degree > best_degree:
+                    best_degree = lo_degree
+                    best_subgraph = subgraph
+                break
+
+            for vertex in lo_vertices:
+                subgraph.remove(vertex)
+
+    best_vertices = []
+    for best_vertex in best_subgraph:
+        best_vertices.add(best_vertex)
+    sort(best_vertices)
+
+    return ",".join(best_vertices)
+
 
 if is_main():
     aoc.solve(23, part1, part2)

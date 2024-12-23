@@ -148,3 +148,4 @@ test(22, 2, d22.part2, 2, 23)
 # Day 23
 import d23
 test(23, 1, d23.part1, 1, 7)
+test(23, 2, d23.part2, 1, "co,de,ka,ta")
