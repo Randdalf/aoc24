@@ -1,0 +1,50 @@
+import aoc
+import sort for sort
+
+fn intersect(a, b):
+    intersection = {}
+    for node in a:
+        if node in b:
+            intersection.add(node, nil)
+    return intersection
+
+export fn part1(input):
+    connections = {}
+
+    fn add_connection(from, to):
+        if from in connections:
+            connections[from].add(to, nil)
+        else:
+            connections[from] = {to: nil}
+
+    for line in input.split("\r\n"):
+        pair = line.split("-")
+        add_connection(pair[0], pair[1])
+        add_connection(pair[1], pair[0])
+
+
+    triplets = {}
+
+    for a in connections:
+        for b in connections[a]:
+            for c in intersect(connections[a], connections[b]):
+                triplet = [a, b, c]
+                sort(triplet)
+                triplets.add((triplet[0], triplet[1], triplet[2]), nil)
+
+    fn has_t(node):
+        return node.starts_with("t")
+
+    count = 0
+
+    for triplet in triplets:
+        if has_t(triplet[0]) or has_t(triplet[1]) or has_t(triplet[2]):
+            count += 1
+
+    return count
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(23, part1, part2)

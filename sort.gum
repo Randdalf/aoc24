@@ -1,0 +1,24 @@
+fn swap(list, i0, i1):
+    temp = list[i0]
+    list[i0] = list[i1]
+    list[i1] = temp
+
+fn partition(list, lo_index, hi_index):
+    pivot = list[hi_index]
+    pivot_index = lo_index - 1
+    for test_index in lo_index...hi_index:
+        if list[test_index] <= pivot:
+            pivot_index += 1
+            swap(list, pivot_index, test_index)
+    pivot_index += 1
+    swap(list, pivot_index, hi_index)
+    return pivot_index
+
+fn quick_sort(list, lo_index, hi_index):
+    if lo_index >= hi_index or lo_index < 0: return
+    pivot_index = partition(list, lo_index, hi_index)
+    quick_sort(list, lo_index, pivot_index - 1)
+    quick_sort(list, pivot_index + 1, hi_index)
+
+export fn sort(list):
+    quick_sort(list, 0, list.num() - 1)
