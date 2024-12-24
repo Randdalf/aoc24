@@ -1,0 +1,74 @@
+import aoc
+import sort for sort
+
+fn op_and(a, b):
+    return a and b
+
+fn op_or(a, b):
+    return a or b
+
+fn op_xor(a, b):
+    return a != b
+
+class Gate:
+    init(left, operator, right, dest):
+        self.left = left
+        self.operator = operator
+        self.right = right
+        self.dest = dest
+
+fn parse_wires(input):
+    wires = {}
+    fn to_bool(x):
+        if x == "1": return true
+        return false
+    for line in input.split("\r\n"):
+        parts = line.split(": ")
+        wires[parts[0]] = to_bool(parts[1])
+    return wires
+
+fn parse_gates(input):
+    gates = []
+    for line in input.split("\r\n"):
+        parts = line.split(" -> ")
+        dest = parts[1]
+        parts = parts[0].split(" ")
+        ops = {"AND": op_and, "OR": op_or, "XOR": op_xor}
+        gates.add(Gate(parts[0], ops[parts[1]], parts[2], dest))
+    return gates
+
+export fn part1(input):
+    parts = input.split("\r\n\r\n")
+    wires = parse_wires(parts[0])
+    gates = parse_gates(parts[1])
+
+    pending = []
+    while gates.num() > 0:
+        while gates.num() > 0:
+            gate = gates.pop()
+            if wires.contains(gate.left) and wires.contains(gate.right):
+                wires[gate.dest] = gate.operator(wires[gate.left], wires[gate.right])
+            else:
+                pending.add(gate)
+        gates = pending
+        pending = []
+
+    z_wires = []
+    for wire in wires:
+        if wire.starts_with("z"):
+            z_wires.add(wire)
+    sort(z_wires)
+            
+    dec = 0
+    for i in (z_wires.num() - 1)..0:
+        dec *= 2
+        if wires[z_wires[i]]:
+            dec += 1
+    
+    return dec
+
+export fn part2(input):
+    pass
+
+if is_main():
+    aoc.solve(24, part1, part2)
