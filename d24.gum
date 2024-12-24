@@ -1,4 +1,5 @@
 import aoc
+import math
 import sort for sort
 
 fn op_and(a, b):
@@ -19,12 +20,9 @@ class Gate:
 
 fn parse_wires(input):
     wires = {}
-    fn to_bool(x):
-        if x == "1": return true
-        return false
     for line in input.split("\r\n"):
         parts = line.split(": ")
-        wires[parts[0]] = to_bool(parts[1])
+        wires[parts[0]] = parts[1] == "1"
     return wires
 
 fn parse_gates(input):
@@ -37,38 +35,94 @@ fn parse_gates(input):
         gates.add(Gate(parts[0], ops[parts[1]], parts[2], dest))
     return gates
 
+fn find_outputs(gates):
+    outputs = []
+    for gate in gates:
+        if gate.dest.starts_with("z"):
+            outputs.add(gate.dest)
+    sort(outputs)
+    return outputs
+
+fn execute(inputs, gates, outputs):
+    values = {}
+    for wire in inputs:
+        values[wire] = inputs[wire]
+    pending = []
+    pending.append(gates)
+    unresolved = []
+    while pending.num() > 0:
+        num_prev_pending = pending.num()
+        while pending.num() > 0:
+            gate = pending.pop()
+            if values.contains(gate.left) and values.contains(gate.right):
+                values[gate.dest] = gate.operator(values[gate.left], values[gate.right])
+            else:
+                unresolved.add(gate)
+        if num_prev_pending == unresolved.num():
+            # Infinite loop detected!
+            return
+        pending = unresolved
+        unresolved = []
+    result = []
+    for output in outputs:
+        result.add(values[output])
+    return result
+
+fn to_dec(values):
+    dec = 0
+    for i in (values.num() - 1)..0:
+        dec *= 2
+        if values[i]:
+            dec += 1
+    return dec
+
+fn from_dec(dec, n):
+    result = []
+    while dec > 0:
+        result.add(math.mod(dec, 2) == 1)
+        dec = math.trunc(dec / 2)
+    while result.num() < n:
+        result.add(0)
+    return result
+
 export fn part1(input):
     parts = input.split("\r\n\r\n")
     wires = parse_wires(parts[0])
     gates = parse_gates(parts[1])
-
-    pending = []
-    while gates.num() > 0:
-        while gates.num() > 0:
-            gate = gates.pop()
-            if wires.contains(gate.left) and wires.contains(gate.right):
-                wires[gate.dest] = gate.operator(wires[gate.left], wires[gate.right])
-            else:
-                pending.add(gate)
-        gates = pending
-        pending = []
-
-    z_wires = []
-    for wire in wires:
-        if wire.starts_with("z"):
-            z_wires.add(wire)
-    sort(z_wires)
-            
-    dec = 0
-    for i in (z_wires.num() - 1)..0:
-        dec *= 2
-        if wires[z_wires[i]]:
-            dec += 1
-    
-    return dec
+    outputs = find_outputs(gates)
+    return to_dec(execute(wires, gates, outputs))
 
 export fn part2(input):
-    pass
+    parts = input.split("\r\n\r\n")
+    wires = parse_wires(parts[0])
+    gates = parse_gates(parts[1])
+    outputs = find_outputs(gates)
+
+    # Find the expected value of the output when the adder is fixed.
+    x_wires = []
+    y_wires = []
+    
+    for wire in wires:
+        if wire.starts_with("x"):
+            x_wires.add(wire)
+        else:
+            y_wires.add(wire)
+
+    sort(x_wires)
+    sort(y_wires)
+
+    x_values = []
+    y_values = []
+
+    for wire in x_wires:
+        x_values.add(wires[wire])
+
+    for wire in y_wires:
+        y_values.add(wires[wire])
+
+    x = to_dec(x_values)
+    y = to_dec(y_values)
+    expected = from_dec(x + y, outputs.num())
 
 if is_main():
     aoc.solve(24, part1, part2)
